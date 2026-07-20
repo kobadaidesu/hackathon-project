@@ -1,0 +1,1 @@
+export type TechTag = { id: number; name: string };
