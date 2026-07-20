@@ -1,3 +1,5 @@
+import logging
+
 import jwt
 from jwt import PyJWKClient
 from fastapi import Depends, HTTPException
@@ -5,6 +7,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.config import settings
 
+logger = logging.getLogger(__name__)
 jwks_client = PyJWKClient(f"{settings.supabase_url}/auth/v1/.well-known/jwks.json")
 security = HTTPBearer()
 
@@ -22,5 +25,6 @@ def get_current_user_id(
             audience="authenticated",
         )
         return payload["sub"]
-    except jwt.PyJWTError:
-        raise HTTPException(status_code=401, detail="認証に失敗しました")
+    except jwt.PyJWTError as exc:
+        logger.warning("JWT validation failed: %s", exc)
+        raise HTTPException(status_code=401, detail="認証に失敗しました") from exc

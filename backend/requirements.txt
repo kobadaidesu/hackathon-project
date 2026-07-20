@@ -3,6 +3,6 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 pydantic-settings
-pyjwt
+pyjwt[crypto]
 httpx
 python-multipart
