@@ -1,4 +1,5 @@
 import { Button } from '../components/common/Button';
+import { ErrorMessage } from '../components/common/ErrorMessage';
 import { Loading } from '../components/common/Loading';
 
 export function LoginPage() {
@@ -9,6 +10,7 @@ export function LoginPage() {
                 ログイン
             </Button>
             <Loading />
+            <ErrorMessage message="テスト用のエラーメッセージです" />
         </div>
     );
 }
