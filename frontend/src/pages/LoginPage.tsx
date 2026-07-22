@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from '../components/common/Button';
 import { ErrorMessage } from '../components/common/ErrorMessage';
-;
+import { Header } from '../components/common/Header'
+import { Tag } from '../components/common/Tag';
 
 export function LoginPage() {
     const [email , setEmail]= useState('');
@@ -19,6 +20,9 @@ export function LoginPage() {
     };
     return (
         <div>
+            <Header />
+            <Tag label="テストタグ" />
+            
             <h1>ログイン</h1>
 
             <div>
