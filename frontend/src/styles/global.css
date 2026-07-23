@@ -1,0 +1,96 @@
+/* ========================================
+   global.css
+   全体で共通利用する変数とリセットのみ。
+   個別ページ・個別コンポーネントの見た目は
+   pages.css / components.css 側で書く。
+   ======================================== */
+
+:root {
+  /* --- 色(仮:案A ブルー主役。チーム確定後に差し替え) --- */
+  --color-bg: #ffffff;           /* 白基調 */
+  --color-surface: #F7FAFE;      /* カード等の下地(白よりわずかに青み) */
+  --color-primary: #0066eb;      /* 淡いブルー(メイン) */
+  /* --color-accent: #AFA9EC;       淡いパープル(差し色) */
+  --color-text: #2C2C2A;
+  --color-text-secondary: #6B6B68;
+  --color-border: #E3ECF5;
+  --color-error: #E24B4A;
+
+  /* --- 角丸(カード基調。柔らかい雰囲気を出すためやや大きめ) --- */
+  --radius-card: 12px;
+  --radius-button: 10px;
+  --radius-tag: 999px;           /* タグ・チップは完全な丸(柔らかさ担当) */
+
+  /* --- 余白(8px刻み) --- */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* --- 投稿画像(「大きく」を変数として明示) --- */
+  --post-image-radius: 12px;
+  --post-image-ratio: 4 / 3;     /* 大きく見せるための固定比率(正方形の小サムネにしない) */
+
+  /* --- キャラクター(「象徴」として大きく置く前提の変数) --- */
+  --character-size-lg: 160px;    /* プロフィール・投稿完了画面など主役の場面 */
+  --character-size-sm: 48px;     /* ヘッダー等の脇役の場面 */
+
+  /* --- 影(柔らかい雰囲気。強い影は使わない) --- */
+  --shadow-card: 0 2px 8px rgba(44, 44, 42, 0.06);
+
+  /* --- レイアウト(スマホ基準・PCは中央表示) --- */
+  --max-width: 640px;
+
+  /* --- フォント --- */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+
+/* ---------- リセット ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body, h1, h2, h3, p, ul, ol {
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------- body/html全体 ---------- */
+html, body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- 共通コンテナ(スマホ基準・PC中央表示) ---------- */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* ---------- 柔らかい雰囲気の基調となるカードの土台 ---------- */
+/* 個別のpaddingやレイアウトはcomponents.css側で調整する前提の「素地」のみ */
+.card-base {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}

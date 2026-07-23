@@ -1,13 +1,19 @@
-import {Navigate, Outlet} from "react-router-dom";
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { Loading } from './Loading';
 
 export function ProtectedRoute() {
-    //本来はここで、AuthContextからcurrentUserを取得する
-    //今は仮で「ログイン済み」ということにする
-    const isAuthenticated = true;//
+  const { currentUser, isLoading } = useAuth();
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" />;
-    }
+  if (isLoading) {
+    // まだログイン状態の確認が終わっていない間は、ローディング表示にする
+    return <Loading />;
+  }
 
-    return <Outlet />;
+  if (!currentUser) {
+    // ログインしていなければ、ログイン画面へ
+    return <Navigate to="/login" />;
+  }
+
+  return <Outlet />;
 }
