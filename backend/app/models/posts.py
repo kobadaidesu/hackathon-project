@@ -1,6 +1,9 @@
 from sqlalchemy import Column, Index, String, DateTime, ForeignKey, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import text
+from sqlalchemy.orm import relationship
+
+from tech_tags import post_tech_tags
 
 from backend.app.database import Base
 
@@ -13,6 +16,7 @@ class Posts(Base):
     content = Column(String(300), nullable=False)
     category = Column(String(30), nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    technologies = relationship("TechTag", secondary=post_tech_tags, back_populates="posts")
 
     __table_args__ = (
         Index("idx_posts_created_at", created_at.desc()),

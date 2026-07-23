@@ -7,15 +7,17 @@ user_technologies = Table(
     Base.metadata,
     
     Column(
+        "user_id",
         UUID(as_uuid=True), 
         ForeignKey("users.id", ondelete="CASCADE"), 
         primary_key=True, 
         nullable=False
     ),
     Column(
-        Integer, 
-        ForeignKey("tech_tags.id", ondelete="CASCADE"), 
-        primary_key=True, 
+        "tech_tag_id",
+        Integer,
+        ForeignKey("tech_tags.id", ondelete="CASCADE"),
+        primary_key=True,
         nullable=False
     )
 )
@@ -24,12 +26,14 @@ post_tech_tags = Table(
     "post_tech_tags",
     Base.metadata,
     Column(
+        "post_id",
         UUID(as_uuid=True),
         ForeignKey("posts.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False
     ),
     Column(
+        "tech_tag_id",
         Integer,
         ForeignKey("tech_tags.id", ondelete="CASCADE"),
         primary_key=True,
@@ -41,12 +45,14 @@ recruitment_tech_tags = Table(
     "recruitment_tech_tags",
     Base.metadata,
     Column(
+        "recruitment_id",
         UUID(as_uuid=True),
         ForeignKey("recruitments.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False
     ),
     Column(
+        "tech_tag_id",
         Integer,
         ForeignKey("tech_tags.id", ondelete="CASCADE"),
         primary_key=True,
