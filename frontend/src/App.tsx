@@ -1,4 +1,5 @@
 import {BrowserRouter, Routes, Route}from "react-router-dom"
+import {AuthProvider} from "./contexts/AuthContext"
 import {LoginPage} from "./pages/LoginPage"
 import {SignupPage} from "./pages/SignupPage"
 import {TimelinePage} from "./pages/TimelinePage"
@@ -14,7 +15,8 @@ import {NotFoundPage} from "./pages/NotFoundPage"
 import {ProtectedRoute} from "./components/common/ProtectedRoute"
 function App() {
   return (
-    <BrowserRouter>
+    <AuthProvider>
+     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
@@ -33,6 +35,7 @@ function App() {
         
       </Routes>
     </BrowserRouter>
+    </AuthProvider>
   );
 }
 
