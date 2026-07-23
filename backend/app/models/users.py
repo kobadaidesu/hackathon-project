@@ -1,8 +1,12 @@
+from readline import backend
+
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 
 from backend.app.database import Base
+from backend.app.models.tech_tags import user_technologies  
 
 class Users(Base):
     __tablename__ = "users"
@@ -17,6 +21,7 @@ class Users(Base):
     experience_points = Column(Integer, nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    technologies = relationship("TechTag", secondary=user_technologies, back_populates="users")
 
 # create table users (
 #   id uuid primary key references auth.users(id) on delete cascade,
