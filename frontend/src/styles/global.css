@@ -6,40 +6,48 @@
    ======================================== */
 
 :root {
-  /* --- 色(仮:案A ブルー主役。チーム確定後に差し替え) --- */
-  --color-bg: #ffffff;           /* 白基調 */
-  --color-surface: #F7FAFE;      /* カード等の下地(白よりわずかに青み) */
-  --color-primary: #0066eb;      /* 淡いブルー(メイン) */
-  /* --color-accent: #AFA9EC;       淡いパープル(差し色) */
+  /* --- 色 --- */
+  --color-bg: #ffffff; /* 白基調 */
+  --color-surface: #F7FAFE;   /* カード等の下地(白よりわずかに青み) */
+  --color-primary: #0066eb;    /* ブルー(メイン) */
+  --color-primary-soft: #eaf1ff;     /* ★追加:ボタンhoverやタグ背景用 */
+  --color-accent: #AFA9EC;           /* ★コメントアウト解除:パープル差し色を実際に使う */
+  --color-accent-soft: #f2edfb;      /* ★追加:カテゴリタグ背景用 */
   --color-text: #2C2C2A;
   --color-text-secondary: #6B6B68;
   --color-border: #E3ECF5;
   --color-error: #E24B4A;
+  --color-error-soft: #fdeceb;       /* ★追加:エラーメッセージ背景用 */
 
-  /* --- 角丸(カード基調。柔らかい雰囲気を出すためやや大きめ) --- */
+  /* --- 角丸 --- */
   --radius-card: 12px;
   --radius-button: 10px;
-  --radius-tag: 999px;           /* タグ・チップは完全な丸(柔らかさ担当) */
+  --radius-tag: 999px;
 
-  /* --- 余白(8px刻み) --- */
+  /* --- 余白 --- */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
 
-  /* --- 投稿画像(「大きく」を変数として明示) --- */
+  /* --- フォントサイズ(★追加:文字サイズも共通の基礎値) --- */
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-lg: 18px;
+
+  /* --- 投稿画像 --- */
   --post-image-radius: 12px;
-  --post-image-ratio: 4 / 3;     /* 大きく見せるための固定比率(正方形の小サムネにしない) */
+  --post-image-ratio: 4 / 3;
 
-  /* --- キャラクター(「象徴」として大きく置く前提の変数) --- */
-  --character-size-lg: 160px;    /* プロフィール・投稿完了画面など主役の場面 */
-  --character-size-sm: 48px;     /* ヘッダー等の脇役の場面 */
+  /* --- キャラクター --- */
+  --character-size-lg: 160px;
+  --character-size-sm: 48px;
 
-  /* --- 影(柔らかい雰囲気。強い影は使わない) --- */
+  /* --- 影 --- */
   --shadow-card: 0 2px 8px rgba(44, 44, 42, 0.06);
 
-  /* --- レイアウト(スマホ基準・PCは中央表示) --- */
+  /* --- レイアウト --- */
   --max-width: 640px;
 
   /* --- フォント --- */
