@@ -1,0 +1,332 @@
+/* ============================================================
+   components.css
+   設計書 13章(デザイン方針)/ 12章(共通コンポーネント)対応
+   対象コンポーネント:
+   Header / Button / Loading / ErrorMessage / Tag /
+   PostCard / CharacterDisplay / RecruitmentCard
+
+   ※ 変数定義は行わない。すべて global.css の :root を参照する。
+   ============================================================ */
+
+/* ---------- レイアウト基準(13章:スマホ基準・中央寄せ) ---------- */
+/* global.css の .container と役割が重複するものは記述していはいけない
+   .container を使うこと。個別に幅を変えたい場合のみここに追記。 */
+
+/* ============================================================
+   Header
+   ============================================================ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header__logo {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.header__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* ============================================================
+   Button(variant対応:primary / secondary / danger)
+   ============================================================ */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  border-radius: var(--radius-button);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.button--primary {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+.button--primary:hover:not(:disabled) {
+  background: #0052bd; /* --color-primaryを少し暗くした固定値。変数化するなら --color-primary-dark を検討 */
+}
+
+.button--secondary {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.button--secondary:hover:not(:disabled) {
+  background: var(--color-surface);
+}
+
+.button--danger {
+  background: var(--color-bg);
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+.button--danger:hover:not(:disabled) {
+  background: var(--color-error-soft);
+}
+
+.button--active {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+/* ============================================================
+   Loading
+   ============================================================ */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+/* ============================================================
+   ErrorMessage
+   ============================================================ */
+.error-message {
+  background: var(--color-error-soft);
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  padding: 10px 14px;
+  border-radius: var(--radius-button);
+  margin: var(--spacing-sm) 0;
+}
+
+/* ============================================================
+   Tag
+   ============================================================ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-tag);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  margin: 2px 4px 2px 0;
+}
+
+.tag--selected {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.tag--category {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+/* ============================================================
+   PostCard
+   ============================================================ */
+.post-card {
+  background: var(--color-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.post-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.post-card__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-surface);
+}
+
+.post-card__author-name {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.post-card__learning-stage {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* 13章:投稿画像を大きく。global.css の --post-image-ratio を活用 */
+.post-card__image {
+  width: 100%;
+  aspect-ratio: var(--post-image-ratio);
+  border-radius: var(--post-image-radius);
+  margin-bottom: var(--spacing-sm);
+  object-fit: cover;
+}
+
+.post-card__content {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+  white-space: pre-wrap;
+}
+
+.post-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.post-card__nice-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-left: 6px;
+}
+
+/* ============================================================
+   CharacterDisplay
+   ============================================================ */
+.character-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-lg) 0;
+}
+
+/* global.css の --character-size-* を活用(場面ごとに使い分け) */
+.character-display__image {
+  width: var(--character-size-lg);
+  height: var(--character-size-lg);
+  object-fit: contain;
+}
+
+.character-display__image--sm {
+  width: var(--character-size-sm);
+  height: var(--character-size-sm);
+}
+
+.character-display__exp-bar {
+  width: 100%;
+  max-width: 240px;
+  height: 10px;
+  background: var(--color-surface);
+  border-radius: var(--radius-tag);
+  overflow: hidden;
+  margin-top: var(--spacing-sm);
+}
+
+.character-display__exp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: var(--radius-tag);
+  transition: width 0.3s ease;
+}
+
+.character-display__exp-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+}
+
+.character-display__evolved-message {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-top: var(--spacing-sm);
+}
+
+/* ============================================================
+   RecruitmentCard
+   ============================================================ */
+.recruitment-card {
+  background: var(--color-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.recruitment-card__title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.recruitment-card__owner {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.recruitment-card__description {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.recruitment-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recruitment-card__interest-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.recruitment-card__status {
+  font-size: var(--font-size-sm);
+  padding: 2px 10px;
+  border-radius: var(--radius-tag);
+}
+
+.recruitment-card__status--open {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.recruitment-card__status--closed {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================================
+   空状態
+   ============================================================ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px var(--spacing-md);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.empty-state__image {
+  width: 80px;
+  height: 80px;
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.8;
+}
