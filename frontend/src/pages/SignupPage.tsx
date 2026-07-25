@@ -1,6 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/common/Button';
 import { ErrorMessage } from '../components/common/ErrorMessage';
+import { Loading } from '../components/common/Loading';
+import { Header } from '../components/common/Header';
 
 export function SignupPage() {
   const [displayName, setDisplayName] = useState('');
@@ -8,8 +12,11 @@ export function SignupPage() {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signupAndInit } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!displayName || !email || !password || !passwordConfirm) {
       setError('すべての項目を入力してください');
       return;
@@ -23,8 +30,16 @@ export function SignupPage() {
       return;
     }
     setError('');
-    // 本来はここで、AuthContextのsignupAndInit関数を呼ぶ(こばださんのauth.tsが届いてから繋ぎ込む)
-    alert(`仮の送信: ${displayName} / ${email}`);
+    setIsSubmitting(true);
+    try {
+      await signupAndInit(email, password, displayName);
+      navigate('/profile/setup');
+    } catch (e) {
+      console.error(e);
+      setError(e instanceof Error ? e.message : '登録に失敗しました');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -72,8 +87,11 @@ export function SignupPage() {
       </div>
 
       {error && <ErrorMessage message={error} />}
+      {isSubmitting && <Loading/>}
 
-      <Button onClick={handleSubmit}>登録</Button>
+      <Button onClick={handleSubmit} disabled={isSubmitting}>
+        登録
+      </Button>
 
       <p>
         アカウントをお持ちの方は <a href="/login">こちらからログイン</a>
