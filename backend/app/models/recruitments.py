@@ -18,6 +18,7 @@ class Recruitment(Base):
     status = Column(String(10), nullable=False, server_default='open')
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     technology = relationship("TechTag", secondary=recruitment_tech_tags, back_populates="posts")
+    user = relationship("User")
 
     __table_args__ = (
         Index("idx_recruitments_created_at", created_at.desc()),
