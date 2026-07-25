@@ -26,3 +26,14 @@ export type ExpResult = {
 };
 
 export type CreatePostResponse = { post: Post; expResult: ExpResult };
+
+export const POST_CATEGORY_LABELS: Record<PostCategory, string> = {
+  learning: "今日の学習",
+  work_in_progress: "制作途中",
+  solved: "解決したこと",
+  error: "エラー・困りごと",
+  new_technology: "新しく試した技術",
+  event: "イベント・ハッカソン",
+  environment: "開発環境",
+  idea: "アイデア",
+};

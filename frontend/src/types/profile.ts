@@ -25,3 +25,12 @@ export type UserProfile = {
   nextEvolution: { required: number; progressPercent: number } | null;
   profileCompleted?: boolean;
 };
+
+export const LEARNING_STAGE_LABELS: Record<LearningStage, string> = {
+  want_to_start: "これから始めたい",
+  learning_basics: "基礎を勉強中",
+  building_small_app: "小さなアプリを制作中",
+  personal_development: "個人開発に挑戦中",
+  want_team_development: "チーム開発に挑戦したい",
+  professional: "実務経験あり",
+};

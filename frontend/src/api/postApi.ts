@@ -58,3 +58,9 @@ export const removeNiceChallenge = (postId: string) =>
   apiRequest<NiceResponse>(`/api/posts/${postId}/nice`, {
     method: "DELETE",
   });
+
+  /** 自分の投稿を削除する */
+export const deletePost = (postId: string) =>
+  apiRequest<void>(`/api/posts/${postId}`, {
+    method: "DELETE",
+  });
