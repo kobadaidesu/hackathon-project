@@ -10,8 +10,9 @@ import type { Post, NiceResponse, CreatePostResponse } from "../types/post";
  * タイムライン取得(最新20件・新着順)
  * 使用例: const { items } = await fetchPosts();
  */
-export const fetchPosts = () =>
+export const fetchPosts = () => 
   apiRequest<{ items: Post[] }>("/api/posts?limit=20");
+
 
 /**
  * 投稿を作成する
