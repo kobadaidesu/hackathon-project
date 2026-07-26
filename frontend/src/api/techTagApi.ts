@@ -13,4 +13,5 @@ import type { TechTag } from "../types/api";
  *   const tags = await fetchTechTags();
  *   // tags は [{ id: 1, name: "React" }, { id: 2, name: "TypeScript" }, ...] のような配列
  */
-export const fetchTechTags = () => apiRequest<TechTag[]>("/api/tech-tags");
+export const fetchTechTags = () =>
+  apiRequest<{ items: TechTag[] }>("/api/tech-tags");

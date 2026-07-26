@@ -33,12 +33,14 @@ export function CreatePostPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 技術タグの選択肢をAPIから取得(自由入力ではなく選択式)
+  //技術タグの選択肢をAPIから取得(自由入力ではなく選択式)
   useEffect(() => {
     fetchTechTags()
-      .then((result) => setTechTags(result))
+      .then((result) =>
+         setTechTags(result.items))
       .catch((e) => console.error(e));
   }, []);
+
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
