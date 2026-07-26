@@ -1,9 +1,18 @@
 type TagProps = {
-    label: string;
+  label: string;
+  selected?: boolean;
+  onClick?: () => void;
 };
 
-export function Tag({ label }: TagProps) {
-    return (
-        <span className="tag">{label}</span>
-    );
+export function Tag({ label, selected, onClick }: TagProps) {
+  return (
+    <span
+      className={`tag${selected ? " tag--selected" : ""}`}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+    >
+      {label}
+    </span>
+  );
 }
+
