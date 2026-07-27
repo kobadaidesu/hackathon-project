@@ -34,9 +34,12 @@ def upload_user_icon():
     return {"message": "User icon uploaded"}
 
 @router.get("/{user_id}")
-def get_user_by_id(user_id: str):
+def get_user_by_id(
+    user_id: str,
+    db: Session = Depends(get_db)
+):
     # 対象ユーザーのプロフィール情報を取得する処理を実装
-    return {"message": f"User information for user_id: {user_id}"}
+    return user_service.get_user_profile(db_session=db, user_id=user_id)
 
 @router.get("/{user_id}/posts")
 def get_user_posts(user_id: str):
