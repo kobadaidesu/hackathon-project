@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import UploadFile, HTTPException, File, Form
 from app.schemas.users import UserSummary, CharacterStage
-from models import posts as post_model, nice_challenges as nice_model, users as user_model, tech_tags as tech_model  # DBモデル（SQLAlchemy）を読み込む
+from app.models import posts as post_model, nice_challenges as nice_model, users as user_model, tech_tags as tech_model  # DBモデル（SQLAlchemy）を読み込む
 from app.schemas.posts import PostCategory, PostResponse, CreatePostResponse, ExpResult, NiceResponse
 from app.constants import XP_PER_POST, EVOLUTION_THRESHOLD
-from user_service import _get_character_stage
+from app.services.user_service import _get_character_stage
 
 # 作成時の画像の受け取りのためにバラバラで受け取るようにする
 def create_post(content: str, category: PostCategory, user_id: str, technology_ids: list[int], image_file: UploadFile = None, db_session: Session = None):
@@ -17,11 +17,11 @@ def create_post(content: str, category: PostCategory, user_id: str, technology_i
     if technology_ids and len(tags) != len(technology_ids):
         raise HTTPException(status_code=400, detail="無効な技術タグが含まれています")
 
-    user = db_session.query(user_model.User).filter(user_model.User.id == user_id).first()
+    user = db_session.query(user_model.Users).filter(user_model.Users.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    new_post = post_model.Post(
+    new_post = post_model.Posts(
         user_id=user_id,
         content=content,
         category=category,
@@ -58,7 +58,7 @@ def create_post(content: str, category: PostCategory, user_id: str, technology_i
 
 def get_posts(db_session: Session, current_user_id: str, limit: int = 20):
     # 投稿取得処理を実装
-    posts = db_session.query(post_model.Post).limit(limit).all()
+    posts = db_session.query(post_model.Posts).limit(limit).all()
 
     posts_response = []
     for post in posts:
@@ -84,7 +84,7 @@ def get_posts(db_session: Session, current_user_id: str, limit: int = 20):
 def delete_post(db_session: Session, post_id: str, current_user_id: str):
     # 投稿削除処理を実装
     # データベースから投稿を削除する処理を行う
-    post = db_session.query(post_model.Post).filter(post_model.Post.id == post_id).first()
+    post = db_session.query(post_model.Posts).filter(post_model.Posts.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
@@ -98,7 +98,7 @@ def delete_post(db_session: Session, post_id: str, current_user_id: str):
 
 def toggle_nice(db_session: Session, post_id: str, current_user_id: str):
     # 投稿のいいね処理を実装
-    post = db_session.query(post_model.Post).filter(post_model.Post.id == post_id).first()
+    post = db_session.query(post_model.Posts).filter(post_model.Posts.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
@@ -137,7 +137,7 @@ def _validate_and_upload_image(file: UploadFile) -> str:
 
     return "https://dummy.url/uploaded-image.png" # 仮置き
 
-def _calc_exp_and_evolve(db_session: Session, user: user_model.User) -> ExpResult:
+def _calc_exp_and_evolve(db_session: Session, user: user_model.Users) -> ExpResult:
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 

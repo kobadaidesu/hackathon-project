@@ -1,9 +1,9 @@
 from fastapi import UploadFile, HTTPException
 from sqlalchemy.orm import Session
-from schemas.recruitments import RecruitmentCreate, RecruitmentStatus, RecruitmentResponse, RecruitmentUpdate
-from schemas.users import UserSummary
-from services.user_service import _get_character_stage
-from models import users as user_model, tech_tags as tech_model, recruitments as recruitment_model
+from app.schemas.recruitments import RecruitmentCreate, RecruitmentStatus, RecruitmentResponse, RecruitmentUpdate
+from app.schemas.users import UserSummary
+from app.services.user_service import _get_character_stage
+from app.models import users as user_model, tech_tags as tech_model, recruitments as recruitment_model
 
 def create_recruitment(db_session: Session, current_user_id: str, recruitment_create: RecruitmentCreate):
     # 募集作成処理を実装

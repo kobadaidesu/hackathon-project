@@ -52,3 +52,9 @@ class ExpResult(ApiSchema):
 class CreatePostResponse(ApiSchema):
     post: PostResponse
     exp_result: ExpResult
+
+
+class PostListResponse(ApiSchema):
+    """一覧は必ず {"items": [...]} で包む(フロントのpostApi.tsがこの形を前提にしている)"""
+
+    items: list[PostResponse] = Field(default_factory=list)

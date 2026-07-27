@@ -2,7 +2,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Table, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import text
 
-from backend.app.database import Base
+from app.database import Base
 
 nice_challenges = Table(
     "nice_challenges",

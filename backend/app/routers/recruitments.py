@@ -16,7 +16,7 @@ def get_recruitments(
     # タイムライン新着順。cursor対応はv4仕様のまま維持(フロント初期は未使用)
     return recruitment_service.get_recruitments(db_session=db, current_user_id=current_user_id, limit=limit)
 
-@router.post("/")
+@router.post("")
 def create_recruitment(
     recruitment_create: RecruitmentCreate,
     db: Session = Depends(get_db),

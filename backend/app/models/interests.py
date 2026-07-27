@@ -2,24 +2,27 @@ from sqlalchemy import Column, Index, String, DateTime, ForeignKey, Table, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import text
 
-from backend.app.database import Base
+from app.database import Base
 
 interests = Table(
     "interests",
     Base.metadata,
     Column(
+        "recruitment_id",
         UUID(as_uuid=True),
         ForeignKey("recruitments.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False
     ),
     Column(
+        "user_id",
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False
     ),
     Column(
+        "created_at",
         DateTime,
         nullable=False,
         server_default=func.now()
