@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import UploadFile, HTTPException, File, Form
 from app.schemas.users import UserSummary, CharacterStage
 from models import posts as post_model, nice_challenges as nice_model, users as user_model, tech_tags as tech_model  # DBモデル（SQLAlchemy）を読み込む
-from schemas.posts import PostCategory, PostResponse, CreatePostRequest, ExpResult, NiceResponse
+from app.schemas.posts import PostCategory, PostResponse, CreatePostResponse, ExpResult, NiceResponse
 from app.constants import XP_PER_POST, EVOLUTION_THRESHOLD
 from user_service import _get_character_stage
 
@@ -49,7 +49,12 @@ def create_post(content: str, category: PostCategory, user_id: str, technology_i
         created_at=new_post.created_at
     )
 
-    return post_response, exp_result
+    create_post_response = CreatePostResponse(
+        post=post_response,
+        exp_result=exp_result
+    )
+
+    return create_post_response
 
 def get_posts(db_session: Session, current_user_id: str, limit: int = 20):
     # 投稿取得処理を実装

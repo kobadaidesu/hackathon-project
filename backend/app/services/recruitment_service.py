@@ -5,9 +5,9 @@ from schemas.users import UserSummary
 from services.user_service import _get_character_stage
 from models import users as user_model, tech_tags as tech_model, recruitments as recruitment_model
 
-def create_recruitment(db_session: Session, user_id: str, recruitment_create: RecruitmentCreate):
+def create_recruitment(db_session: Session, current_user_id: str, recruitment_create: RecruitmentCreate):
     # 募集作成処理を実装
-    user = db_session.query(user_model.User).filter(user_model.User.id == user_id).first()
+    user = db_session.query(user_model.User).filter(user_model.User.id == current_user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -18,7 +18,7 @@ def create_recruitment(db_session: Session, user_id: str, recruitment_create: Re
         raise HTTPException(status_code=400, detail="無効な技術タグが含まれています")
 
     new_recruitment = recruitment_model.Recruitment(
-        user_id=user_id,
+        user_id=current_user_id,
         title=recruitment_create.title,
         description=recruitment_create.description,
         desired_learning_stage=recruitment_create.preferred_learning_stage,
