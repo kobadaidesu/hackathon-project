@@ -14,9 +14,9 @@ def get_posts(
     limit: int = 20
 ):
     # タイムライン新着順。cursor対応はv4仕様のまま維持(フロント初期は未使用)
-    return post_service,get_posts(db_session=db, current_user_id=current_user_id, limit=limit)
+    return post_service.get_posts(db_session=db, current_user_id=current_user_id, limit=limit)
 
-@router.post("/", response_model=CreatePostResponse)
+@router.post("", response_model=CreatePostResponse)
 def create_post(
     content: str = Form(...),
     category: PostCategory = Form(...),

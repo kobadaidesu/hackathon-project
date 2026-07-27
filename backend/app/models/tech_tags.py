@@ -1,6 +1,8 @@
 from sqlalchemy import Column, String, Integer, Table, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
-from backend.app.database import Base
+from sqlalchemy.orm import relationship
+
+from app.database import Base
 
 user_technologies = Table(
     "user_technologies",
@@ -65,6 +67,13 @@ class TechTag(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(30), unique=True, nullable=False)
+
+    # 各モデルの technologies から back_populates で参照される側
+    users = relationship("Users", secondary=user_technologies, back_populates="technologies")
+    posts = relationship("Posts", secondary=post_tech_tags, back_populates="technologies")
+    recruitments = relationship(
+        "Recruitment", secondary=recruitment_tech_tags, back_populates="technologies"
+    )
 
 # create table tech_tags (
 #   id serial primary key,

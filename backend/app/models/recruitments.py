@@ -3,8 +3,8 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import text
 from sqlalchemy.orm import relationship
 
-from backend.app.database import Base
-from tech_tags import recruitment_tech_tags
+from app.database import Base
+from app.models.tech_tags import recruitment_tech_tags
 
 class Recruitment(Base):
     __tablename__ = "recruitments"
@@ -14,11 +14,13 @@ class Recruitment(Base):
     title = Column(String(50), nullable=False)
     description = Column(String(500), nullable=False)
     desired_learning_stage = Column(String(30))
-    beginner_welcome = Column(Boolean, nullable=False, server_default=False)
+    beginner_welcome = Column(Boolean, nullable=False, server_default="false")
     status = Column(String(10), nullable=False, server_default='open')
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    technology = relationship("TechTag", secondary=recruitment_tech_tags, back_populates="posts")
-    user = relationship("User")
+    technologies = relationship(
+        "TechTag", secondary=recruitment_tech_tags, back_populates="recruitments"
+    )
+    user = relationship("Users")
 
     __table_args__ = (
         Index("idx_recruitments_created_at", created_at.desc()),

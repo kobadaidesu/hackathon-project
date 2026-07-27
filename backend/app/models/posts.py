@@ -3,9 +3,8 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import text
 from sqlalchemy.orm import relationship
 
-from tech_tags import post_tech_tags
-
-from backend.app.database import Base
+from app.database import Base
+from app.models.tech_tags import post_tech_tags
 
 class Posts(Base):
     __tablename__ = "posts"
@@ -17,7 +16,7 @@ class Posts(Base):
     category = Column(String(30), nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     technologies = relationship("TechTag", secondary=post_tech_tags, back_populates="posts")
-    user = relationship("User")
+    user = relationship("Users")
 
     __table_args__ = (
         Index("idx_posts_created_at", created_at.desc()),

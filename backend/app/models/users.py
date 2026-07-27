@@ -1,17 +1,18 @@
-from readline import backend
-
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
-from backend.app.database import Base
-from backend.app.models.tech_tags import user_technologies  
+from app.database import Base
+from app.models.tech_tags import user_technologies
 
 class Users(Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), ForeignKey("auth.users.id", ondelete="CASCADE"), primary_key=True)
+    # auth.usersへの外部キーはDB側(schema.sql)で定義済み。
+    # auth.usersはSupabase管理でBase.metadataに存在しないため、ここでは張らない
+    # (張るとNoReferencedTableErrorでマッパー設定が落ちる)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     display_name = Column(String(30))
     bio = Column(String(300))
     icon_url = Column(String)

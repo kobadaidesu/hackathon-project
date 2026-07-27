@@ -47,3 +47,9 @@ class RecruitmentResponse(ApiSchema):
 class InterestResponse(ApiSchema):
     interest_count: int = Field(ge=0)
     is_interested_by_me: bool
+
+
+class RecruitmentListResponse(ApiSchema):
+    """一覧は必ず {"items": [...]} で包む"""
+
+    items: list[RecruitmentResponse] = Field(default_factory=list)
