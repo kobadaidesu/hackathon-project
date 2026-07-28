@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.posts import CreatePostResponse, PostCategory
+from app.schemas.posts import CreatePostResponse, PostCategory, PostListResponse
 from app.database import get_db
 from app.dependencies import get_current_user_id
 from app.services import post_service
 
 router = APIRouter(prefix="/api/posts", tags=["Posts"])
 
-@router.get("")
+@router.get("", response_model=PostListResponse)
 def get_posts(
     db: Session = Depends(get_db),
     current_user_id: str = Depends(get_current_user_id),
