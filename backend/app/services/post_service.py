@@ -4,15 +4,16 @@ from fastapi import UploadFile, HTTPException, File, Form
 from app.schemas.users import UserSummary, CharacterStage
 from app.models import posts as post_model, nice_challenges as nice_model, users as user_model, tech_tags as tech_model  # DBモデル（SQLAlchemy）を読み込む
 from app.schemas.posts import PostCategory, PostResponse, PostListResponse, CreatePostResponse, ExpResult, NiceResponse
-from app.constants import XP_PER_POST, EVOLUTION_THRESHOLD
+from app.constants import XP_PER_POST, EVOLUTION_THRESHOLD, POST_IMAGE_BUCKET
+from app.services import storage_service
 from app.services.user_service import _get_character_stage
 
 # 作成時の画像の受け取りのためにバラバラで受け取るようにする
 def create_post(content: str, category: PostCategory, user_id: str, technology_ids: list[int], image_file: UploadFile = None, db_session: Session = None):
-    # 投稿作成処理を実装
-    image_url = None
-    if image_file:
-        image_url = _validate_and_upload_image(image_file)
+    # posts.image_url は NOT NULL なので画像は必須
+    if image_file is None:
+        raise HTTPException(status_code=400, detail="画像を選択してください")
+    image_url = _validate_and_upload_image(image_file, user_id)
 
     tags = db_session.query(tech_model.TechTag).filter(tech_model.TechTag.id.in_(technology_ids)).all()
     if technology_ids and len(tags) != len(technology_ids):
@@ -188,21 +189,11 @@ def _count_nices(db_session: Session, post_id) -> int:
         .scalar()
     )
 
-def _validate_and_upload_image(file: UploadFile) -> str:
-    # 画像ファイルのバリデーション処理を実装
-    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
-        raise HTTPException(status_code=400, detail="Invalid image file type")
-    
-    file.file.seek(0, 2)
-    file_size = file.file.tell()
-    file.file.seek(0)  # 次の保存処理のためにカーソルを先頭に戻す
-    
-    if file_size > 5 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="ファイルサイズは5MB以下にしてください")
-
-    # 画像ファイルの保存処理を実装（supabase）
-
-    return "https://dummy.url/uploaded-image.png" # 仮置き
+def _validate_and_upload_image(file: UploadFile, user_id: str) -> str:
+    # 検証とアップロードはstorage_serviceに集約している(アイコンと共通)
+    return storage_service.upload_image(
+        file, bucket=POST_IMAGE_BUCKET, prefix=str(user_id)
+    )
 
 def _calc_exp_and_evolve(db_session: Session, user: user_model.Users) -> ExpResult:
     if not user:

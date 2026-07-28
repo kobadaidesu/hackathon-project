@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 from app.dependencies import get_current_user_id
 from app.database import get_db
@@ -28,10 +28,17 @@ def update_current_user(
         update_data=update_data
     )
 
-@router.post("/me/icon")
-def upload_user_icon():
-    # ユーザーアイコンをアップロードする処理を実装
-    return {"message": "User icon uploaded"}
+@router.post("/me/icon", response_model=UserProfileResponse)
+def upload_user_icon(
+    image_file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user_id)
+):
+    # multipartのフィールド名は引数名そのまま(image_file)。
+    # Form/FileはPydanticのApiSchemaを通らずcamelCase変換が効かない
+    return user_service.update_user_icon(
+        db_session=db, user_id=current_user_id, image_file=image_file
+    )
 
 @router.get("/{user_id}", response_model=UserProfileResponse)
 def get_user_by_id(

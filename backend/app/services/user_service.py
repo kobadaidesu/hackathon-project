@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, UploadFile
 from app.models import users as user_model, tech_tags as tech_model  # DBモデル（SQLAlchemy）を読み込む
 from app.schemas.users import UserProfileUpdate, UserProfileResponse, CharacterStage, NextEvolution
-from app.constants import EVOLUTION_THRESHOLD
+from app.constants import EVOLUTION_THRESHOLD, AVATAR_BUCKET
+from app.services import storage_service
 
 def get_user_profile(db_session: Session, user_id: str):
     # ユーザープロフィール取得処理を実装
@@ -40,8 +41,20 @@ def update_user_profile(db_session: Session, user_id: str, update_data: UserProf
 
     return _to_get_user_profile(user=user)
 
-def update_user_icon(db_session: Session, user_id: str, image_file: UploadFile = None):
+def update_user_icon(db_session: Session, user_id: str, image_file: UploadFile):
+    """アイコンをStorageへ上げ、users.icon_urlを差し替える"""
     user = db_session.query(user_model.Users).filter(user_model.Users.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # 古い画像はStorageに残るが、容量を圧迫する規模ではないので消していない
+    user.icon_url = storage_service.upload_image(
+        image_file, bucket=AVATAR_BUCKET, prefix=str(user_id)
+    )
+    db_session.commit()
+    db_session.refresh(user)
+
+    return _to_get_user_profile(user=user)
 
 # いつか他人で処理が必要になった時用
 # def get_ohter_user_profile(db_session: Session, current_user_id: str, target_user_id: str):
