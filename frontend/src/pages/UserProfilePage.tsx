@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import type { UserProfile } from "../types/profile";
 import { fetchUserProfile } from "../api/profileApi";
+import { useAuth } from "../contexts/AuthContext";
 import { ProfileView } from "../components/profile/ProfileView";
 import { Loading } from "../components/common/Loading";
 import { ErrorMessage } from "../components/common/ErrorMessage";
 
 export function UserProfilePage() {
   const { userId } = useParams<{ userId: string }>();
+  const { currentUser } = useAuth();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,13 +42,16 @@ export function UserProfilePage() {
         <h1 className="page__title">
           {profile.displayName ?? "(表示名未設定)"}さんのプロフィール
         </h1>
-        {/* DMの入口はここ1箇所。募集詳細からもownerのプロフィールへ飛べる */}
-        <Link
-          to={`/messages/${profile.id}`}
-          className="button button--primary"
-        >
-          メッセージを送る
-        </Link>
+        {/* DMの入口はここ1箇所。募集詳細からもownerのプロフィールへ飛べる。
+            自分自身には送れない(APIも400を返す)ので、自分のときは出さない */}
+        {currentUser?.id !== profile.id && (
+          <Link
+            to={`/messages/${profile.id}`}
+            className="button button--primary"
+          >
+            メッセージを送る
+          </Link>
+        )}
       </div>
 
       <ProfileView profile={profile} />
