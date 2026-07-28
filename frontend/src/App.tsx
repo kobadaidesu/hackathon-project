@@ -11,6 +11,8 @@ import { PostCompletePage } from "./pages/PostCompletePage"
 import { RecruitmentListPage } from "./pages/RecruitmentListPage"
 import { CreateRecruitmentPage } from "./pages/CreateRecruitmentPage"
 import { RecruitmentDetailPage } from "./pages/RecruitmentDetailPage"
+import { MessageListPage } from "./pages/MessageListPage"
+import { MessageThreadPage } from "./pages/MessageThreadPage"
 import { NotFoundPage } from "./pages/NotFoundPage"
 import { ProtectedRoute } from "./components/common/ProtectedRoute"
 import { Header } from "./components/common/Header"
@@ -34,6 +36,8 @@ function App() {
             <Route path="/recruitments" element={<RecruitmentListPage />} />
             <Route path="/recruitments/new" element={<CreateRecruitmentPage />} />
             <Route path="/recruitments/:recruitmentId" element={<RecruitmentDetailPage />} />
+            <Route path="/messages" element={<MessageListPage />} />
+            <Route path="/messages/:userId" element={<MessageThreadPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
 

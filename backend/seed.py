@@ -101,6 +101,20 @@ NICES = [(0, 1), (0, 2), (0, 3), (1, 0), (1, 2), (2, 0), (5, 1), (6, 3), (7, 1)]
 # (募集インデックス, 興味ありを送るユーザーのインデックス)
 INTERESTS = [(0, 0), (0, 2), (0, 3), (1, 0)]
 
+# DMのデモ用。(送信者, 受信者, 本文, 既読か)
+# 「興味あり → DMで会話開始」の導線が見えるように、募集者(さとう)と
+# 興味ありを送った人(たなか)のやりとりを中心にしてある。
+# 未読ありと既読済みを混ぜて、バッジの見え方を両方確認できるようにする。
+MESSAGES = [
+    (0, 1, "募集拝見しました！学習記録アプリ面白そうですね", True),
+    (1, 0, "ありがとうございます！フロント触れる方を探してました", True),
+    (0, 1, "Reactなら少し書けます。週2〜3時間くらいなら出せそうです", True),
+    (1, 0, "ちょうどいいペースです。今週末に一度話しませんか？", False),
+    (1, 0, "Discordでも大丈夫です", False),
+    (2, 0, "ハッカソンの件、もしよければ一緒にどうですか", False),
+    (0, 3, "環境構築の件、Nodeのバージョン揃えると直りますよ", True),
+]
+
 
 def main() -> None:
     db = SessionLocal()
@@ -132,6 +146,7 @@ def main() -> None:
         # ON DELETE CASCADE で一緒に消える
         db.execute(text("delete from posts"))
         db.execute(text("delete from recruitments"))
+        db.execute(text("delete from messages"))
 
         # --- ユーザーのプロフィール(既存行の更新のみ) ---
         for user_id, profile in zip(user_ids, USER_PROFILES):
@@ -262,6 +277,30 @@ def main() -> None:
             )
             interest_count += 1
         print(f"興味ありを作成: {interest_count}件")
+
+        # --- ダイレクトメッセージ ---
+        message_count = 0
+        for index, (sender, receiver, body, is_read) in enumerate(MESSAGES):
+            if sender >= len(user_ids) or receiver >= len(user_ids):
+                continue
+            db.execute(
+                text(
+                    "insert into messages (sender_id, receiver_id, body, read_at, created_at)"
+                    " values (:s, :r, :b,"
+                    "   case when :read then now() - (:n || ' minute')::interval else null end,"
+                    "   now() - (:n || ' minute')::interval)"
+                ),
+                {
+                    "s": user_ids[sender],
+                    "r": user_ids[receiver],
+                    "b": body,
+                    "read": is_read,
+                    # 会話の順序が分かるように送信時刻をずらす
+                    "n": str((len(MESSAGES) - index) * 20),
+                },
+            )
+            message_count += 1
+        print(f"メッセージを作成: {message_count}件")
 
         db.commit()
         print("seed: 完了")

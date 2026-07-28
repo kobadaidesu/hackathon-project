@@ -5,6 +5,7 @@
 drop trigger if exists on_auth_user_created on auth.users;
 drop function if exists public.handle_new_user();
 
+drop table if exists messages cascade;
 drop table if exists nice_challenges cascade;
 drop table if exists interests cascade;
 drop table if exists user_technologies cascade;
@@ -103,6 +104,23 @@ create table interests (
   primary key (recruitment_id, user_id)
 );
 
+-- ダイレクトメッセージ。
+-- 会話は「2人の組み合わせ」から導出するので conversations テーブルは持たない。
+-- read_at が null のものが未読。
+create table messages (
+  id uuid primary key default gen_random_uuid(),
+  sender_id uuid not null references users(id) on delete cascade,
+  receiver_id uuid not null references users(id) on delete cascade,
+  body varchar(1000) not null,
+  read_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+-- 特定の相手とのやりとりを新着順に引くため
+create index idx_messages_pair on messages (sender_id, receiver_id, created_at desc);
+-- 未読件数の集計用。部分インデックスなので既読が増えても太らない
+create index idx_messages_unread on messages (receiver_id) where read_at is null;
+
 -- auth.usersに登録が入ったらpublic.usersにも行を作る
 -- security definerを付けないと権限エラーで動かないので注意
 create function public.handle_new_user()
@@ -131,3 +149,4 @@ alter table post_tech_tags enable row level security;
 alter table recruitment_tech_tags enable row level security;
 alter table nice_challenges enable row level security;
 alter table interests enable row level security;
+alter table messages enable row level security;

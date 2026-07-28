@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.dependencies import get_current_user_id
-from app.routers import nice, posts, recruitments, tech_tags, users
+from app.routers import messages, nice, posts, recruitments, tech_tags, users
 
 app = FastAPI()
 
@@ -29,6 +29,7 @@ app.include_router(posts.router)
 app.include_router(nice.router)
 app.include_router(recruitments.router)
 app.include_router(tech_tags.router)
+app.include_router(messages.router)
 
 
 @app.get("/api/health")
