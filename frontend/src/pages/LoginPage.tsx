@@ -4,8 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/common/Button';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 import { Loading } from '../components/common/Loading';
-import { Header } from '../components/common/Header';
-import { Tag } from '../components/common/Tag';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -34,7 +32,6 @@ export function LoginPage() {
 
   return (
     <div>
-      <Header />
       <h1>ログイン</h1>
 
       <div>

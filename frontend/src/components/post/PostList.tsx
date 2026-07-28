@@ -36,6 +36,11 @@ export function PostList() {
     );
   };
 
+  // 削除が成功したら一覧から取り除く(再取得はしない)
+  const handlePostDelete = (postId: string) => {
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+  };
+
   if (isLoading) return <Loading />;
   if (error) return <ErrorMessage message={error} />;
 
@@ -50,7 +55,12 @@ export function PostList() {
   return (
     <div className="post-list">
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} onUpdate={handlePostUpdate} />
+        <PostCard
+          key={post.id}
+          post={post}
+          onUpdate={handlePostUpdate}
+          onDelete={handlePostDelete}
+        />
       ))}
     </div>
   );
