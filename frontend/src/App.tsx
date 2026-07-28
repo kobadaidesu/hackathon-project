@@ -13,10 +13,14 @@ import { CreateRecruitmentPage } from "./pages/CreateRecruitmentPage"
 import { RecruitmentDetailPage } from "./pages/RecruitmentDetailPage"
 import { NotFoundPage } from "./pages/NotFoundPage"
 import { ProtectedRoute } from "./components/common/ProtectedRoute"
+import { Header } from "./components/common/Header"
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        {/* Headerは全画面共通。未ログイン時はナビを出さない分岐がHeader側にある */}
+        <Header />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />

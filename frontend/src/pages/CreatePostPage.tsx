@@ -27,7 +27,8 @@ export function CreatePostPage() {
   const [category, setCategory] = useState<PostCategory>(
     CATEGORY_OPTIONS[0][0]
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // バックエンドはタグ名ではなくタグIDを受け取るので、選択状態はIDで持つ
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
   const [techTags, setTechTags] = useState<TechTag[]>([]);
   const [error, setError] = useState("");
@@ -37,7 +38,7 @@ export function CreatePostPage() {
   useEffect(() => {
     fetchTechTags()
       .then((result) =>
-         setTechTags(result.items))
+         setTechTags(result.items ?? []))
       .catch((e) => console.error(e));
   }, []);
 
@@ -48,11 +49,9 @@ export function CreatePostPage() {
     setImagePreviewUrl(file ? URL.createObjectURL(file) : null);
   };
 
-  const toggleTag = (tagName: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tagName)
-        ? prev.filter((t) => t !== tagName)
-        : [...prev, tagName]
+  const toggleTag = (tagId: number) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
     );
   };
 
@@ -79,12 +78,16 @@ export function CreatePostPage() {
     setError("");
     setIsSubmitting(true);
     try {
+      // multipartのフィールド名はFastAPIの引数名そのまま(snake_case)。
+      // Form()はPydanticのApiSchemaを通らないためcamelCase変換が効かない。
       const formData = new FormData();
-      formData.append("image", imageFile as File);
+      formData.append("image_file", imageFile as File);
       formData.append("content", content);
       formData.append("category", category);
-      // 選んだタグ名の配列をJSON文字列にして送る(例: '["React","Python"]'、なしは'[]')
-      formData.append("technologyTags", JSON.stringify(selectedTags));
+      // list[int]はJSON文字列ではなく同名フィールドの繰り返しで渡す
+      selectedTagIds.forEach((id) =>
+        formData.append("technology_ids", String(id))
+      );
 
       const result = await createPost(formData);
 
@@ -97,8 +100,8 @@ export function CreatePostPage() {
   };
 
   return (
-    <div className="create-post-page">
-      <h1>投稿を作成</h1>
+    <div className="page create-post-page">
+      <h1 className="page__title">投稿を作成</h1>
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -146,8 +149,8 @@ export function CreatePostPage() {
               <Tag
                 key={tag.id}
                 label={tag.name}
-                selected={selectedTags.includes(tag.name)}
-                onClick={() => toggleTag(tag.name)}
+                selected={selectedTagIds.includes(tag.id)}
+                onClick={() => toggleTag(tag.id)}
               />
             ))}
           </div>
@@ -156,11 +159,16 @@ export function CreatePostPage() {
         <ErrorMessage message={error} />
 
         <div className="form-actions">
-          <button type="submit" disabled={isSubmitting}>
+          <button
+            type="submit"
+            className="button button--primary"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "投稿中..." : "投稿する"}
           </button>
           <button
             type="button"
+            className="button button--secondary"
             onClick={() => navigate(-1)}
             disabled={isSubmitting}
           >

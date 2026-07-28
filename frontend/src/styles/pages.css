@@ -1,0 +1,229 @@
+/* ========================================
+   pages.css
+   ページ単位のレイアウトを書く。
+   複数箇所で使い回す部品の見た目は components.css 側。
+   変数(色・余白・角丸)は global.css の :root を使う。
+   ======================================== */
+
+/* ---------- 全ページ共通の枠 ---------- */
+.page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-md);
+}
+
+.page__title {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ---------- フォーム(投稿作成・募集作成・プロフィール設定で共通) ---------- */
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group > label {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -1px;
+}
+
+.form-group__checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.form-group__checkbox > label {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.image-preview {
+  width: 100%;
+  aspect-ratio: var(--post-image-ratio);
+  object-fit: cover;
+  border-radius: var(--post-image-radius);
+  margin-top: var(--spacing-sm);
+}
+
+/* ---------- タイムライン(/) ---------- */
+.timeline-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* PostCardの中で使われているがcomponents.cssに無かったもの */
+.post-card__body {
+  padding: var(--spacing-md);
+}
+
+.post-card__category {
+  display: inline-block;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  background-color: var(--color-accent-soft);
+  border-radius: var(--radius-tag);
+  padding: 2px var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.post-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.post-card__avatar--placeholder {
+  background-color: var(--color-border);
+}
+
+.post-card__error {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+}
+
+.nice-button {
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-tag);
+  padding: var(--spacing-xs) var(--spacing-md);
+}
+
+.nice-button--active {
+  color: var(--color-bg);
+  background-color: var(--color-primary);
+}
+
+.nice-button:disabled {
+  opacity: 0.5;
+}
+
+/* ---------- 投稿完了(/posts/complete) ---------- */
+.post-complete-page {
+  text-align: center;
+}
+
+.evolution-message {
+  color: var(--color-primary);
+  font-weight: bold;
+  margin: var(--spacing-md) 0;
+}
+
+/* ---------- プロフィール(/profile, /users/:userId) ---------- */
+.profile-page__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.profile-page__avatar {
+  width: var(--character-size-sm);
+  height: var(--character-size-sm);
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--color-border);
+}
+
+.profile-page__name {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+}
+
+.profile-page__learning-stage {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.profile-page__section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.profile-page__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.profile-page__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.profile-page__links a {
+  color: var(--color-primary);
+}
+
+/* ---------- 募集(/recruitments) ---------- */
+.recruitment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.recruitment-detail__section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.recruitment-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- 404 ---------- */
+.not-found-page {
+  text-align: center;
+  padding-top: var(--spacing-xl);
+}

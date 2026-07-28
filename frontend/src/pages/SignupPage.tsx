@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/common/Button';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 import { Loading } from '../components/common/Loading';
-import { Header } from '../components/common/Header';
 
 export function SignupPage() {
   const [displayName, setDisplayName] = useState('');

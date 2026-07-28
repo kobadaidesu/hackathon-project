@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import type { CreatePostResponse } from "../types/post";
+import { CharacterDisplay } from "../components/profile/CharacterDisplay";
 
 export function PostCompletePage() {
   const location = useLocation();
@@ -22,28 +23,18 @@ export function PostCompletePage() {
   const { expResult } = state;
 
   return (
-    <div className="post-complete-page">
-      <h1>投稿が完了しました!</h1>
+    <div className="page post-complete-page">
+      <h1 className="page__title">投稿が完了しました!</h1>
 
-      <div className="character-display">
-        <img
-          src={
-            expResult.characterStage === "chick"
-              ? "/images/character-chick.png"
-              : "/images/character-egg.png"
-          }
-          alt={expResult.characterStage === "chick" ? "ひよこ" : "たまご"}
-        />
-      </div>
+      <CharacterDisplay
+        characterStage={expResult.characterStage}
+        evolved={expResult.evolved}
+      />
 
       <p>獲得経験値:+{expResult.gained}</p>
       <p>現在の経験値:{expResult.total}</p>
 
-      {expResult.evolved && (
-        <p className="evolution-message">ひよこエンジニアに進化!</p>
-      )}
-
-      <Link to="/" className="button">
+      <Link to="/" className="button button--primary">
         タイムラインへ戻る
       </Link>
     </div>
