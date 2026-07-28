@@ -1,22 +1,50 @@
 // src/components/post/PostCard.tsx
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import type { Post } from "../../types/post";
-import { sendNiceChallenge, removeNiceChallenge } from "../../api/postApi";
+import {
+  sendNiceChallenge,
+  removeNiceChallenge,
+  deletePost,
+} from "../../api/postApi";
 import { Tag } from "../common/Tag";
 // 修正後
 import { LEARNING_STAGE_LABELS } from "../../types/profile";
 import { POST_CATEGORY_LABELS } from "../../types/post";
+import { useAuth } from "../../contexts/AuthContext";
 
 type Props = {
   post: Post;
   // ナイス挑戦の結果を親(PostList)のstateに反映してもらうためのコールバック
   onUpdate: (updatedPost: Post) => void;
+  // 渡されたときだけ削除ボタンを出す。削除後に一覧から取り除くのは親の役目
+  onDelete?: (postId: string) => void;
 };
 
-export function PostCard({ post, onUpdate }: Props) {
+export function PostCard({ post, onUpdate, onDelete }: Props) {
+  const { currentUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
+
+  // 削除できるのは自分の投稿だけ(最終的な権限チェックはバックエンド側)
+  const canDelete = Boolean(onDelete) && currentUser?.id === post.author.id;
+
+  const handleDelete = async () => {
+    if (isDeleting) return;
+    if (!window.confirm("この投稿を削除しますか?")) return;
+
+    setIsDeleting(true);
+    setError("");
+    try {
+      await deletePost(post.id);
+      onDelete?.(post.id);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "投稿の削除に失敗しました");
+      setIsDeleting(false);
+    }
+  };
 
   const handleNice = async () => {
     // 二重送信防止:通信中はここで弾く
@@ -58,7 +86,9 @@ export function PostCard({ post, onUpdate }: Props) {
           <div className="post-card__avatar post-card__avatar--placeholder" />
         )}
         <div>
-          <p className="post-card__author-name">{post.author.displayName}</p>
+          <Link to={`/users/${post.author.id}`} className="post-card__author-name">
+            {post.author.displayName}
+          </Link>
           {post.author.learningStage && (
             <p className="post-card__learning-stage">
               {LEARNING_STAGE_LABELS[post.author.learningStage]}
@@ -100,6 +130,17 @@ export function PostCard({ post, onUpdate }: Props) {
           >
             {post.isNicedByMe ? "✓ ナイス挑戦" : "ナイス挑戦"} {post.niceCount}
           </button>
+
+          {canDelete && (
+            <button
+              type="button"
+              className="button button--danger"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "削除中..." : "削除"}
+            </button>
+          )}
         </div>
 
         {error && <p className="post-card__error">{error}</p>}

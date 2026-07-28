@@ -1,9 +1,9 @@
 // src/components/profile/CharacterDisplay.tsx
 // キャラクターと経験値バーの表示。プロフィール画面と投稿完了画面の両方で使う。
 //
-// 画像は public/images/character-{egg,chick}.png を参照する。
-// まだ用意されていないので、読み込みに失敗したら絵文字にフォールバックする
-// (壊れた画像アイコンが出ないようにするため。画像を置けば自動で切り替わる)。
+// 画像は public/images/character-{egg,chick}.svg を参照する。
+// 中身は仮アセットなので、デザイン確定後はそのファイルを差し替えるだけでよい。
+// 読み込みに失敗した場合は絵文字にフォールバックする(壊れた画像アイコンを出さないため)。
 
 import { useState } from "react";
 import type { CharacterStage } from "../../types/profile";
@@ -59,7 +59,7 @@ export function CharacterDisplay({
       ) : (
         <img
           className={imageClassName}
-          src={`/images/character-${characterStage}.png`}
+          src={`/images/character-${characterStage}.svg`}
           alt={CHARACTER_LABELS[characterStage]}
           onError={() => setImageFailed(true)}
         />

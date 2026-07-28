@@ -42,6 +42,10 @@ export function ProfileView({ profile }: Props) {
     );
   };
 
+  const handlePostDelete = (postId: string) => {
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+  };
+
   return (
     <>
       <div className="profile-page__header">
@@ -117,7 +121,12 @@ export function ProfileView({ profile }: Props) {
         ) : (
           <div className="post-list">
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} onUpdate={handlePostUpdate} />
+              <PostCard
+                key={post.id}
+                post={post}
+                onUpdate={handlePostUpdate}
+                onDelete={handlePostDelete}
+              />
             ))}
           </div>
         )}

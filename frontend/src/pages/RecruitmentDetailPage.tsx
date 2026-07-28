@@ -9,7 +9,9 @@ import {
   fetchRecruitment,
   sendInterest,
   removeInterest,
+  updateRecruitment,
 } from "../api/recruitmentApi";
+import { useAuth } from "../contexts/AuthContext";
 import { LEARNING_STAGE_LABELS } from "../types/profile";
 import { Tag } from "../components/common/Tag";
 import { Loading } from "../components/common/Loading";
@@ -17,12 +19,14 @@ import { ErrorMessage } from "../components/common/ErrorMessage";
 
 export function RecruitmentDetailPage() {
   const { recruitmentId } = useParams<{ recruitmentId: string }>();
+  const { currentUser } = useAuth();
 
   const [recruitment, setRecruitment] = useState<Recruitment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [interestError, setInterestError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     if (!recruitmentId) return;
@@ -55,11 +59,33 @@ export function RecruitmentDetailPage() {
     }
   };
 
+  // 募集者本人だけが募集を終了できる(最終的な権限チェックはバックエンド側)
+  const handleClose = async () => {
+    if (!recruitment || isClosing) return;
+    if (!window.confirm("この募集を終了しますか?")) return;
+
+    setIsClosing(true);
+    setInterestError("");
+    try {
+      const updated = await updateRecruitment(recruitment.id, {
+        status: "closed",
+      });
+      setRecruitment(updated);
+    } catch (e) {
+      setInterestError(
+        e instanceof Error ? e.message : "募集の終了に失敗しました"
+      );
+    } finally {
+      setIsClosing(false);
+    }
+  };
+
   if (isLoading) return <Loading />;
   if (error) return <ErrorMessage message={error} />;
   if (!recruitment) return <ErrorMessage message="募集が見つかりません" />;
 
   const isOpen = recruitment.status === "open";
+  const isOwner = currentUser?.id === recruitment.owner.id;
 
   return (
     <div className="page recruitment-detail-page">
@@ -110,16 +136,35 @@ export function RecruitmentDetailPage() {
       </section>
 
       <section className="recruitment-detail__section">
-        <button
-          type="button"
-          className={`button ${
-            recruitment.isInterestedByMe ? "button--active" : "button--primary"
-          }`}
-          onClick={handleInterest}
-          disabled={isSubmitting || !isOpen}
-        >
-          {recruitment.isInterestedByMe ? "✓ 興味あり" : "興味あり"}
-        </button>
+        <div className="form-actions">
+          {/* 自分の募集には興味ありを送れないので、募集者には終了ボタンを出す */}
+          {isOwner ? (
+            isOpen && (
+              <button
+                type="button"
+                className="button button--danger"
+                onClick={handleClose}
+                disabled={isClosing}
+              >
+                {isClosing ? "終了中..." : "募集を終了する"}
+              </button>
+            )
+          ) : (
+            <button
+              type="button"
+              className={`button ${
+                recruitment.isInterestedByMe
+                  ? "button--active"
+                  : "button--primary"
+              }`}
+              onClick={handleInterest}
+              disabled={isSubmitting || !isOpen}
+            >
+              {recruitment.isInterestedByMe ? "✓ 興味あり" : "興味あり"}
+            </button>
+          )}
+        </div>
+
         {!isOpen && <p>この募集は終了しています。</p>}
         {interestError && <ErrorMessage message={interestError} />}
       </section>
