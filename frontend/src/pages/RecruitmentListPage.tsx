@@ -15,7 +15,7 @@ export function RecruitmentListPage() {
 
   useEffect(() => {
     fetchRecruitments()
-      .then((result) => setRecruitments(result.items))
+      .then((result) => setRecruitments(result.items ?? []))
       .catch((e) =>
         setError(e instanceof Error ? e.message : "募集の取得に失敗しました")
       )

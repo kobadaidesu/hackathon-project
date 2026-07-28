@@ -21,7 +21,7 @@ export function PostList() {
     setError("");
     try {
       const result = await fetchPosts();
-      setPosts(result.items);
+      setPosts(result.items ?? []);
     } catch (e) {
       setError(e instanceof Error ? e.message : "投稿の取得に失敗しました");
     } finally {

@@ -26,7 +26,8 @@ export function ProfileView({ profile }: Props) {
     setIsLoadingPosts(true);
     setPostsError("");
     fetchUserPosts(profile.id)
-      .then((result) => setPosts(result.items))
+      // APIが想定外の形を返してもページごと落とさない(?? [])
+      .then((result) => setPosts(result.items ?? []))
       .catch((e) =>
         setPostsError(
           e instanceof Error ? e.message : "投稿の取得に失敗しました"

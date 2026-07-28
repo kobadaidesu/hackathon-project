@@ -115,10 +115,19 @@ def get_recruitment(db_session: Session, current_user_id: str, recruitment_id: s
     )
 
 
-def get_recruitments(db_session: Session, current_user_id: str, limit: int = 20) -> RecruitmentListResponse:
+def get_recruitments(
+    db_session: Session,
+    current_user_id: str,
+    limit: int = 20,
+    user_id: str | None = None,
+) -> RecruitmentListResponse:
+    """募集一覧。user_idを渡すとその人が出した募集だけに絞る(プロフィール画面用)"""
+    query = db_session.query(recruitment_model.Recruitment)
+    if user_id is not None:
+        query = query.filter(recruitment_model.Recruitment.user_id == user_id)
+
     recruitments = (
-        db_session.query(recruitment_model.Recruitment)
-        .order_by(recruitment_model.Recruitment.created_at.desc())
+        query.order_by(recruitment_model.Recruitment.created_at.desc())
         .limit(limit)
         .all()
     )
