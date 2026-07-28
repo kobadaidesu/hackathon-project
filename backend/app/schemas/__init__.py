@@ -8,6 +8,7 @@ from app.schemas.posts import (
     PostResponse,
 )
 from app.schemas.recruitments import (
+    InterestedUserListResponse,
     InterestResponse,
     RecruitmentCreate,
     RecruitmentListResponse,
@@ -30,6 +31,7 @@ __all__ = [
     "CreatePostResponse",
     "ExpResult",
     "InterestResponse",
+    "InterestedUserListResponse",
     "LearningStage",
     "NextEvolution",
     "NiceResponse",

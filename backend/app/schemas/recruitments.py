@@ -53,3 +53,9 @@ class RecruitmentListResponse(ApiSchema):
     """一覧は必ず {"items": [...]} で包む"""
 
     items: list[RecruitmentResponse] = Field(default_factory=list)
+
+
+class InterestedUserListResponse(ApiSchema):
+    """興味ありを送ったユーザー一覧(募集者のみ閲覧可)"""
+
+    items: list[UserSummary] = Field(default_factory=list)

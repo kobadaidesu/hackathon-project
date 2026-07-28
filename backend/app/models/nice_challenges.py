@@ -1,33 +1,32 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Table, func
+from sqlalchemy import Column, DateTime, ForeignKey, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import text
 
 from app.database import Base
 
-nice_challenges = Table(
-    "nice_challenges",
-    Base.metadata,
-    Column(
-        "user_id",
-        UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="CASCADE"),
-        primary_key=True,
-        nullable=False
-    ),
-    Column(
-        "post_id",
+
+# 中間テーブルだが、件数の集計と行の追加・削除をサービス層から直接扱うため
+# Core の Table ではなく ORM クラスとして定義する。
+# (relationship の secondary としては使っていない)
+class NiceChallenge(Base):
+    __tablename__ = "nice_challenges"
+
+    post_id = Column(
         UUID(as_uuid=True),
         ForeignKey("posts.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False
-    ),
-    Column(
-        "created_at",
-        DateTime,
+    )
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False
+    )
+    created_at = Column(
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now()
     )
-)
 
 # create table nice_challenges (
 #   post_id uuid not null references posts(id) on delete cascade,

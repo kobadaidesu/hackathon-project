@@ -1,8 +1,9 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi import UploadFile, HTTPException, File, Form
 from app.schemas.users import UserSummary, CharacterStage
 from app.models import posts as post_model, nice_challenges as nice_model, users as user_model, tech_tags as tech_model  # DBモデル（SQLAlchemy）を読み込む
-from app.schemas.posts import PostCategory, PostResponse, CreatePostResponse, ExpResult, NiceResponse
+from app.schemas.posts import PostCategory, PostResponse, PostListResponse, CreatePostResponse, ExpResult, NiceResponse
 from app.constants import XP_PER_POST, EVOLUTION_THRESHOLD
 from app.services.user_service import _get_character_stage
 
@@ -39,7 +40,14 @@ def create_post(content: str, category: PostCategory, user_id: str, technology_i
 
     post_response = PostResponse(
         id=new_post.id,
-        author=UserSummary(id=user.id, display_name=user.display_name, icon_url=user.icon_url, character_stage=exp_result.character_stage),
+        # UserSummaryの項目はavatar_url / learning_stage。
+        # icon_url等の余分なキーはPydanticに無視され、静かにNoneになるので注意
+        author=UserSummary(
+            id=user.id,
+            display_name=user.display_name,
+            avatar_url=user.icon_url,
+            learning_stage=user.learning_stage,
+        ),
         image_url=new_post.image_url,
         content=new_post.content,
         category=new_post.category,
@@ -56,30 +64,57 @@ def create_post(content: str, category: PostCategory, user_id: str, technology_i
 
     return create_post_response
 
-def get_posts(db_session: Session, current_user_id: str, limit: int = 20):
-    # 投稿取得処理を実装
-    posts = db_session.query(post_model.Posts).limit(limit).all()
+def get_posts(db_session: Session, current_user_id: str, limit: int = 20) -> PostListResponse:
+    # タイムラインは新着順
+    posts = (
+        db_session.query(post_model.Posts)
+        .order_by(post_model.Posts.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+    if not posts:
+        return PostListResponse(items=[])
 
-    posts_response = []
-    for post in posts:
-        tags = [tag.name for tag in post.technologies]  # タグ名のリストを作成
-        character_stage = _get_character_stage(post.user.experience_points)
-        nice_challenges = db_session.query(nice_model.Nice).filter_by(post_id=post.id).all()
-        is_niced_by_me = any(nice.user_id == current_user_id for nice in nice_challenges)
-        post_response = PostResponse(
+    # 投稿ごとにナイスを引くとN+1になるので、対象IDぶんをまとめて1回で集計する
+    post_ids = [post.id for post in posts]
+    nice_counts = dict(
+        db_session.query(nice_model.NiceChallenge.post_id, func.count())
+        .filter(nice_model.NiceChallenge.post_id.in_(post_ids))
+        .group_by(nice_model.NiceChallenge.post_id)
+        .all()
+    )
+    my_nice_post_ids = {
+        row[0]
+        for row in db_session.query(nice_model.NiceChallenge.post_id)
+        .filter(
+            nice_model.NiceChallenge.post_id.in_(post_ids),
+            nice_model.NiceChallenge.user_id == current_user_id,
+        )
+        .all()
+    }
+
+    items = [
+        PostResponse(
             id=post.id,
-            author=UserSummary(id=post.user.id, display_name=post.user.display_name, icon_url=post.user.icon_url, character_stage=character_stage),
+            author=UserSummary(
+                id=post.user.id,
+                display_name=post.user.display_name,
+                avatar_url=post.user.icon_url,
+                learning_stage=post.user.learning_stage,
+            ),
             image_url=post.image_url,
             content=post.content,
             category=post.category,
-            technology_tags=tags,
-            nice_count=len(nice_challenges),
-            is_niced_by_me=is_niced_by_me,
-            created_at=post.created_at
+            technology_tags=[tag.name for tag in post.technologies],
+            # 0件の投稿はGROUP BYの結果に出てこないのでgetで既定値0を使う
+            nice_count=nice_counts.get(post.id, 0),
+            is_niced_by_me=post.id in my_nice_post_ids,
+            created_at=post.created_at,
         )
-        posts_response.append(post_response)
+        for post in posts
+    ]
 
-    return posts_response
+    return PostListResponse(items=items)
 
 def delete_post(db_session: Session, post_id: str, current_user_id: str):
     # 投稿削除処理を実装
@@ -88,7 +123,9 @@ def delete_post(db_session: Session, post_id: str, current_user_id: str):
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    if post.user_id != current_user_id:
+    # current_user_idはJWTから来る文字列、user_idはUUIDオブジェクトなので
+    # そのまま比較すると常に不一致になる
+    if str(post.user_id) != str(current_user_id):
         raise HTTPException(status_code=403, detail="Not authorized to delete this post")
     
     db_session.delete(post)
@@ -102,24 +139,54 @@ def toggle_nice(db_session: Session, post_id: str, current_user_id: str):
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    if post.user_id == current_user_id:
-        raise HTTPException(status_code=400, detail="Cannot nice your own post")
+    if str(post.user_id) == str(current_user_id):
+        raise HTTPException(status_code=400, detail="自分の投稿にはナイス挑戦を送れません")
 
-    nice_challenges = db_session.query(nice_model.Nice).filter_by(post_id=post.id).all()
-    is_niced_by_me = any(nice.user_id == current_user_id for nice in nice_challenges)
-    if is_niced_by_me:
+    already_niced = (
+        db_session.query(nice_model.NiceChallenge)
+        .filter_by(post_id=post.id, user_id=current_user_id)
+        .first()
+    )
+    if already_niced:
         raise HTTPException(status_code=409, detail="Already niced this post")
 
-    new_nice = nice_model.Nice(post_id=post_id, user_id=current_user_id)
-    db_session.add(new_nice)
+    db_session.add(nice_model.NiceChallenge(post_id=post_id, user_id=current_user_id))
     db_session.commit()
 
-    nice_response = NiceResponse(
-        nice_count=len(nice_challenges) + 1,
-        is_niced_by_me=True
+    return NiceResponse(
+        nice_count=_count_nices(db_session, post.id),
+        is_niced_by_me=True,
     )
 
-    return nice_response
+
+def remove_nice(db_session: Session, post_id: str, current_user_id: str) -> NiceResponse:
+    """ナイス挑戦の取り消し。既に取り消し済みでも成功として扱う(冪等)"""
+    post = db_session.query(post_model.Posts).filter(post_model.Posts.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    nice = (
+        db_session.query(nice_model.NiceChallenge)
+        .filter_by(post_id=post_id, user_id=current_user_id)
+        .first()
+    )
+    if nice:
+        db_session.delete(nice)
+        db_session.commit()
+
+    return NiceResponse(
+        nice_count=_count_nices(db_session, post.id),
+        is_niced_by_me=False,
+    )
+
+
+def _count_nices(db_session: Session, post_id) -> int:
+    return (
+        db_session.query(func.count())
+        .select_from(nice_model.NiceChallenge)
+        .filter(nice_model.NiceChallenge.post_id == post_id)
+        .scalar()
+    )
 
 def _validate_and_upload_image(file: UploadFile) -> str:
     # 画像ファイルのバリデーション処理を実装
