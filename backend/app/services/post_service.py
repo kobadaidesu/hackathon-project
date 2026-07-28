@@ -64,13 +64,20 @@ def create_post(content: str, category: PostCategory, user_id: str, technology_i
 
     return create_post_response
 
-def get_posts(db_session: Session, current_user_id: str, limit: int = 20) -> PostListResponse:
-    # タイムラインは新着順
+def get_posts(
+    db_session: Session,
+    current_user_id: str,
+    limit: int = 20,
+    user_id: str | None = None,
+) -> PostListResponse:
+    """投稿一覧。user_idを渡すとそのユーザーの投稿だけに絞る(プロフィール画面用)"""
+    query = db_session.query(post_model.Posts)
+    if user_id is not None:
+        query = query.filter(post_model.Posts.user_id == user_id)
+
+    # 新着順
     posts = (
-        db_session.query(post_model.Posts)
-        .order_by(post_model.Posts.created_at.desc())
-        .limit(limit)
-        .all()
+        query.order_by(post_model.Posts.created_at.desc()).limit(limit).all()
     )
     if not posts:
         return PostListResponse(items=[])

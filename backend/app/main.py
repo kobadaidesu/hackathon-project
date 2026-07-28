@@ -8,7 +8,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # デプロイ時にVercelのURLを追加
+    # 開発中はポートを問わない。
+    # 5173が埋まっているとViteは5174で起動するため、決め打ちにすると
+    # ブラウザ側でプリフライトが弾かれて「Failed to fetch」になる
+    allow_origin_regex=r"http://localhost:\d+",
+    allow_origins=[],  # デプロイ時にVercelのURLをここへ追加
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

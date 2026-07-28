@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.dependencies import get_current_user_id
 from app.database import get_db
+from app.schemas.posts import PostListResponse
+from app.schemas.recruitments import RecruitmentListResponse
 from app.schemas.users import UserProfileUpdate, UserProfileResponse
-from app.services import user_service
+from app.services import post_service, recruitment_service, user_service
 
 router = APIRouter(prefix="/api/users", tags=["Users"])
 
@@ -41,12 +43,27 @@ def get_user_by_id(
     # 対象ユーザーのプロフィール情報を取得する処理を実装
     return user_service.get_user_profile(db_session=db, user_id=user_id)
 
-@router.get("/{user_id}/posts")
-def get_user_posts(user_id: str):
-    # 対象ユーザーの投稿一覧を取得する処理を実装
-    return {"message": f"Posts for user_id: {user_id}"}
+@router.get("/{user_id}/posts", response_model=PostListResponse)
+def get_user_posts(
+    user_id: str,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user_id)
+):
+    # プロフィール画面の投稿一覧。isNicedByMeは「見ている人」基準なので
+    # current_user_idとuser_idの両方を渡す
+    return post_service.get_posts(
+        db_session=db, current_user_id=current_user_id, limit=limit, user_id=user_id
+    )
 
-@router.get("/{user_id}/recruitments")
-def get_user_recruitments(user_id: str):
-    # 対象ユーザーの募集一覧を取得する処理を実装
-    return {"message": f"Recruitments for user_id: {user_id}"}
+@router.get("/{user_id}/recruitments", response_model=RecruitmentListResponse)
+def get_user_recruitments(
+    user_id: str,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user_id)
+):
+    # 対象ユーザーが出した募集一覧
+    return recruitment_service.get_recruitments(
+        db_session=db, current_user_id=current_user_id, limit=limit, user_id=user_id
+    )
