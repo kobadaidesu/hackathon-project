@@ -34,6 +34,22 @@ export const updateMyProfile = (body: ProfileUpdate) =>
     body: JSON.stringify(body),
   });
 
+/**
+ * アイコン画像をアップロードして差し替える
+ * multipartのフィールド名は image_file(FastAPIの引数名そのまま。
+ * Form/FileはcamelCase変換が効かない)
+ *
+ * 使用例:
+ *   const formData = new FormData();
+ *   formData.append("image_file", file);
+ *   const updated = await uploadMyIcon(formData);
+ */
+export const uploadMyIcon = (formData: FormData) =>
+  apiRequest<UserProfile>("/api/users/me/icon", {
+    method: "POST",
+    body: formData,
+  });
+
 /** 他ユーザーのプロフィールを取得する */
 export const fetchUserProfile = (userId: string) =>
   apiRequest<UserProfile>(`/api/users/${userId}`);

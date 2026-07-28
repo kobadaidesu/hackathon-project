@@ -2,10 +2,10 @@
 // 登録直後の着地点。表示名以外のプロフィール項目をここで埋める。
 // 表示名はsignupAndInitが既にPATCH済みだが、後から変えられるようフォームには置く。
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { updateMyProfile } from "../api/profileApi";
+import { updateMyProfile, uploadMyIcon } from "../api/profileApi";
 import { fetchTechTags } from "../api/techTagApi";
 import { LEARNING_STAGE_LABELS } from "../types/profile";
 import type { LearningStage } from "../types/profile";
@@ -36,6 +36,10 @@ export function ProfileSetupPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // アイコンはStorageへの保存が必要なので、他の項目と分けて即アップロードする
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isUploadingIcon, setIsUploadingIcon] = useState(false);
+
   // 既に入力済みの値があればフォームの初期値にする(設定画面として開き直せるように)
   useEffect(() => {
     if (!currentUser) return;
@@ -44,7 +48,30 @@ export function ProfileSetupPage() {
     setLearningStage(currentUser.learningStage ?? "");
     setGithubUrl(currentUser.githubUrl ?? "");
     setContactUrl(currentUser.contactUrl ?? "");
+    setAvatarUrl(currentUser.avatarUrl);
   }, [currentUser]);
+
+  const handleIconChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || isUploadingIcon) return;
+
+    setIsUploadingIcon(true);
+    setError("");
+    try {
+      const formData = new FormData();
+      // フィールド名はFastAPIの引数名そのまま(snake_case)
+      formData.append("image_file", file);
+      const updated = await uploadMyIcon(formData);
+      setAvatarUrl(updated.avatarUrl);
+      await refreshCurrentUser();
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "アイコンのアップロードに失敗しました"
+      );
+    } finally {
+      setIsUploadingIcon(false);
+    }
+  };
 
   // 技術タグの選択肢はAPIから取得する(自由入力ではなく選択式)
   useEffect(() => {
@@ -94,6 +121,21 @@ export function ProfileSetupPage() {
       <h1 className="page__title">プロフィール設定</h1>
 
       <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="icon">アイコン</label>
+          {avatarUrl && (
+            <img src={avatarUrl} alt="" className="profile-page__avatar" />
+          )}
+          <input
+            id="icon"
+            type="file"
+            accept="image/*"
+            onChange={handleIconChange}
+            disabled={isUploadingIcon}
+          />
+          {isUploadingIcon && <p>アップロード中...</p>}
+        </div>
+
         <div className="form-group">
           <label htmlFor="displayName">表示名</label>
           <input
