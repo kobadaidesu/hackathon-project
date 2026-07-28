@@ -2,7 +2,7 @@
 // 他ユーザーのプロフィール。編集ボタンは出さない。
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import type { UserProfile } from "../types/profile";
 import { fetchUserProfile } from "../api/profileApi";
 import { ProfileView } from "../components/profile/ProfileView";
@@ -36,9 +36,18 @@ export function UserProfilePage() {
 
   return (
     <div className="page profile-page">
-      <h1 className="page__title">
-        {profile.displayName ?? "(表示名未設定)"}さんのプロフィール
-      </h1>
+      <div className="timeline-page__header">
+        <h1 className="page__title">
+          {profile.displayName ?? "(表示名未設定)"}さんのプロフィール
+        </h1>
+        {/* DMの入口はここ1箇所。募集詳細からもownerのプロフィールへ飛べる */}
+        <Link
+          to={`/messages/${profile.id}`}
+          className="button button--primary"
+        >
+          メッセージを送る
+        </Link>
+      </div>
 
       <ProfileView profile={profile} />
     </div>

@@ -1,3 +1,11 @@
+from app.schemas.messages import (
+    ConversationListResponse,
+    ConversationResponse,
+    MessageCreate,
+    MessageListResponse,
+    MessageResponse,
+    UnreadCountResponse,
+)
 from app.schemas.posts import (
     CreatePostResponse,
     ExpResult,
@@ -28,7 +36,13 @@ from app.schemas.users import (
 
 __all__ = [
     "CharacterStage",
+    "ConversationListResponse",
+    "ConversationResponse",
     "CreatePostResponse",
+    "MessageCreate",
+    "MessageListResponse",
+    "MessageResponse",
+    "UnreadCountResponse",
     "ExpResult",
     "InterestResponse",
     "InterestedUserListResponse",
