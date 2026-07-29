@@ -78,6 +78,18 @@ button {
   cursor: pointer;
 }
 
+/* モバイルでタップした瞬間に出る四角いハイライトを消す。
+   角丸を無視した矩形で描かれるので、ピル型のボタンだと形が合わない。
+   押した感触は各要素の :active(translateY) が持っているので支障はない */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* フォーム部品はブラウザ既定の書体・サイズを持っていて body から継承しない。
    .form-group の外に素で置かれた input(ログイン・新規登録・DM入力など)が
    標準ゴシックのままになるので、ここで丸ゴシックに揃える */

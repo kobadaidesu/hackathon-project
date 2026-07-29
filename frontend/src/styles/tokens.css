@@ -102,9 +102,11 @@
   --ds-color-pending-bg: #F0E7D6;     /* 「送信中…」 */
   --ds-color-pending-text: #BCAB93;
 
-  /* --- 経験値バー --- */
-  --ds-color-progress-track: #EFE3CC;
-  --ds-gradient-progress: linear-gradient(90deg, #C9A57B, #8A5F3C);
+  /* --- 経験値バー ---
+     溝は地(淡い黄)と同系色だと輪郭が消えるので、寒色側に振って差を作る。
+     ゲージ本体はタブバーの投稿ボタンと同じ青系でそろえる */
+  --ds-color-progress-track: #DCE7F3;
+  --ds-gradient-progress: linear-gradient(90deg, #7CB2E8, #2472C8);
 
   /* --- グラデーション面 --- */
   --ds-gradient-card: linear-gradient(160deg, #FFFFFF 0%, #FBF4E6 100%);

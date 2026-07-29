@@ -5,12 +5,14 @@
 // ログアウトは滅多に使わないので、常時見えるここではなくプロフィール画面へ置いた。
 
 import { Link } from "react-router-dom";
+import { LOGO } from "../../lib/mascot";
 
 export function Header() {
   return (
     <header className="header">
-      <Link to="/" className="header__logo">
-        Sudachi
+      {/* ロゴ画像がアプリ名そのものなので、alt にアプリ名を入れる */}
+      <Link to="/" className="header__logo" aria-label="Sudachi ホームへ">
+        <img src={LOGO} alt="Sudachi" width={300} height={66} />
       </Link>
     </header>
   );

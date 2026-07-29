@@ -28,10 +28,15 @@
   background: transparent;
 }
 
+/* ワードマーク画像。高さを決めて幅は成り行きにする */
 .header__logo {
-  font-size: var(--ds-font-size-md);
-  font-weight: var(--ds-font-weight-display);
-  color: var(--ds-color-accent);
+  display: inline-flex;
+  align-items: center;
+}
+
+.header__logo img {
+  width: auto;
+  height: 26px;
 }
 
 /* ============================================================
@@ -520,9 +525,11 @@
   color: var(--ds-color-text);
 }
 
+/* カード内の文字は本文・表示名と同じ黒でそろえる。
+   表示名との差は文字サイズ(15px と 12px)で付ける */
 .post-card__meta {
   font-size: var(--ds-font-size-xs);
-  color: var(--ds-color-text-muted);
+  color: var(--ds-color-text);
 }
 
 /* 13章:投稿画像を大きく。global.css の --post-image-ratio を活用 */
@@ -599,18 +606,20 @@
 .character-display__exp-bar {
   width: 100%;
   max-width: 240px;
-  height: 10px;
-  background: var(--color-surface);
-  border-radius: var(--radius-tag);
+  height: var(--ds-progress-height);
+  background: var(--ds-color-progress-track);
+  border-radius: var(--ds-radius-pill);
   overflow: hidden;
-  margin-top: var(--spacing-sm);
+  margin-top: var(--ds-space-sm);
+  /* 溝の縁を1本入れて、地に溶けないようにする */
+  box-shadow: inset 0 0 0 1px rgba(36, 114, 200, 0.16);
 }
 
 .character-display__exp-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-  border-radius: var(--radius-tag);
-  transition: width 0.3s ease;
+  background: var(--ds-gradient-progress);
+  border-radius: var(--ds-radius-pill);
+  transition: width var(--ds-duration-count) var(--ds-ease-default);
 }
 
 .character-display__exp-label {

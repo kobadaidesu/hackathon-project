@@ -136,6 +136,12 @@ body:has(.tab-bar) .page {
   font-weight: var(--ds-font-weight-bold);
   line-height: 1;
   cursor: pointer;
+  /* 中身はひよこの画像・♥★・数字で、どれも選択する意味がない。
+     長押し気味のタップで水色の選択ハイライトや画像の共有メニューが
+     出てしまうので止める */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   /* パーティクルがボタンの外へ飛ぶので切り取らない */
   overflow: visible;
   /* 白いカードが無く、地(淡い黄)に直接載る。surface-tint だと地と差がなく
@@ -192,6 +198,9 @@ body:has(.tab-bar) .page {
   height: 100%;
   object-fit: contain;
   display: block;
+  /* タップの当たり判定はボタンに任せる。画像自身がイベント対象になると
+     ドラッグや長押しの対象として扱われる */
+  pointer-events: none;
   /* 未ナイスは彩度を落として静かに待たせる */
   filter: saturate(0.45);
   transition: filter var(--ds-duration-state) var(--ds-ease-default);

@@ -26,6 +26,9 @@ export const ILLUSTRATION = {
   login: "/images/login-hero.png",
 } as const;
 
+/** ヘッダー左上のワードマーク */
+export const LOGO = "/images/logo-sudachi.png";
+
 export const TAB_ICON = {
   home: "/images/tab-home.png",
   recruit: "/images/tab-recruit.png",
