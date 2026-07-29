@@ -56,7 +56,7 @@ export function CreatePostPage() {
   };
 
   const validate = (): string | null => {
-    if (!imageFile) return "画像を選択してください";
+    // 画像は任意。文章だけで投稿できる
     if (content.trim().length === 0) return "本文を入力してください";
     if (content.length > CONTENT_MAX_LENGTH)
       return `本文は${CONTENT_MAX_LENGTH}字以内で入力してください`;
@@ -81,7 +81,9 @@ export function CreatePostPage() {
       // multipartのフィールド名はFastAPIの引数名そのまま(snake_case)。
       // Form()はPydanticのApiSchemaを通らないためcamelCase変換が効かない。
       const formData = new FormData();
-      formData.append("image_file", imageFile as File);
+      // 未選択のときはフィールドごと送らない。空で送るとFastAPI側が
+      // UploadFile として受け取ってしまい、画像なしと区別できなくなる
+      if (imageFile) formData.append("image_file", imageFile);
       formData.append("content", content);
       formData.append("category", category);
       // list[int]はJSON文字列ではなく同名フィールドの繰り返しで渡す

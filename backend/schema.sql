@@ -48,7 +48,8 @@ insert into tech_tags (name) values
 create table posts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references users(id) on delete cascade,
-  image_url text not null,
+  -- 画像は任意。文章だけの投稿を許す(migrations/002_post_image_optional.sql)
+  image_url text,
   content varchar(300) not null,
   category varchar(30) not null,
   created_at timestamptz not null default now()

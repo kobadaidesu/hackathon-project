@@ -11,7 +11,7 @@ class Posts(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    image_url = Column(String, nullable=False)
+    image_url = Column(String, nullable=True)  # 画像は任意(文章だけの投稿を許す)
     content = Column(String(300), nullable=False)
     category = Column(String(30), nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())

@@ -7,7 +7,7 @@ export type PostCategory =
 export type Post = {
   id: string;
   author: UserSummary;
-  imageUrl: string;
+  imageUrl: string | null; // 画像は任意。文章だけの投稿では null
   content: string;
   category: PostCategory;
   technologyTags: string[];

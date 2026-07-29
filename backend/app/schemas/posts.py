@@ -28,7 +28,7 @@ class PostCreate(ApiSchema):
 class PostResponse(ApiSchema):
     id: UUID
     author: UserSummary
-    image_url: str
+    image_url: str | None = None  # 画像なしの投稿では null
     content: str
     category: PostCategory
     technology_tags: list[str] = Field(default_factory=list)
