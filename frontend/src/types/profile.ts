@@ -2,7 +2,8 @@ export type LearningStage =
   | "want_to_start" | "learning_basics" | "building_small_app"
   | "personal_development" | "want_team_development" | "professional";
 
-export type CharacterStage = "egg" | "chick";
+/** 経験値100ごとに1段階。chick が最終段階 */
+export type CharacterStage = "egg" | "hatching" | "chick";
 
 export type UserSummary = {
   id: string;

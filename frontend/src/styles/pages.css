@@ -9,12 +9,20 @@
 .page {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: var(--spacing-lg) var(--spacing-md);
+  padding: var(--ds-space-xl) var(--ds-space-screen-x) var(--ds-space-3xl);
+}
+
+/* タブバーが出ている画面(=ログイン済み)だけ、その高さぶん下を空ける。
+   ログイン・登録画面には無駄な余白を作らない */
+body:has(.tab-bar) .page {
+  padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
 }
 
 .page__title {
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--spacing-lg);
+  font-size: var(--ds-font-size-2xl);
+  font-weight: var(--ds-font-weight-display);
+  line-height: var(--ds-line-height-tight);
+  margin-bottom: var(--ds-space-xl);
 }
 
 /* ---------- フォーム(投稿作成・募集作成・プロフィール設定で共通) ---------- */
@@ -86,64 +94,153 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-lg);
+  /* 下余白は .page__title 側が持っているので、ここでは足さない */
 }
 
+/* 投稿間の間隔は .post-card 自身の上下パディングが持つ。
+   ここで gap を足すと罫線から本文が離れすぎるので 0 にする */
 .post-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* PostCardの中で使われているがcomponents.cssに無かったもの */
-.post-card__body {
-  padding: var(--spacing-md);
-}
-
-.post-card__category {
-  display: inline-block;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  background-color: var(--color-accent-soft);
-  border-radius: var(--radius-tag);
-  padding: 2px var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
 }
 
 .post-card__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-xs);
-  margin-top: var(--spacing-sm);
-}
-
-.post-card__avatar--placeholder {
-  background-color: var(--color-border);
+  /* .tag の margin を外したぶん、間隔はここで持つ */
+  gap: var(--ds-space-tag-gap);
+  /* 余った幅は受け取るが、タグ1個ぶんより狭くは縮まない
+     (min-width:auto のまま = min-content。ここを 0 にすると
+     狭い画面でタグが1行1個まで潰れてしまう) */
+  flex: 1 1 auto;
 }
 
 .post-card__error {
   color: var(--color-error);
-  font-size: var(--font-size-sm);
-  margin-top: var(--spacing-xs);
+  font-size: var(--ds-font-size-sm);
 }
 
+/* ---------- ナイス挑戦ボタン(3ステート) ---------- */
 .nice-button {
-  font-family: inherit;
-  font-size: var(--font-size-sm);
-  color: var(--color-primary);
-  background-color: var(--color-bg);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-tag);
-  padding: var(--spacing-xs) var(--spacing-md);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  /* ラベルを外したので右の余白を詰める。
+     上下 9px はひよこ26pxと合わせて高さ44px = 最小タップ領域ちょうど。
+     ここを削ると44pxを割るので、小さくするのは左右とひよこ側で行う */
+  padding: 9px 14px 9px 10px;
+  border: none;
+  border-radius: var(--ds-radius-pill);
+  font-family: var(--ds-font-base);
+  font-size: var(--ds-font-size-base);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: 1;
+  cursor: pointer;
+  /* 中身はひよこの画像・♥★・数字で、どれも選択する意味がない。
+     長押し気味のタップで水色の選択ハイライトや画像の共有メニューが
+     出てしまうので止める */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  /* パーティクルがボタンの外へ飛ぶので切り取らない */
+  overflow: visible;
+  /* 白いカードが無く、地(淡い黄)に直接載る。surface-tint だと地と差がなく
+     輪郭が消えるので、.button の未指定バリアントと同じ「白＋細枠」で形を保つ */
+  background: var(--ds-color-surface);
+  color: var(--ds-color-text-secondary);
+  box-shadow: var(--ds-border-inset);
+  transition:
+    background var(--ds-duration-state) var(--ds-ease-default),
+    color var(--ds-duration-state) var(--ds-ease-default),
+    box-shadow var(--ds-duration-state) var(--ds-ease-default),
+    transform var(--ds-duration-press) var(--ds-ease-default);
 }
 
+.nice-button--lg {
+  gap: 10px;
+  padding: 11px 19px 11px 13px;
+  font-size: var(--ds-font-size-md);
+}
+
+/* ナイス済はマスコットの黄で返す。青の塗りつぶしにすると
+   カード内で投稿画像より強い要素になってしまうため、淡い黄地に留める */
 .nice-button--active {
-  color: var(--color-bg);
-  background-color: var(--color-primary);
+  background: var(--ds-color-nice-bg);
+  color: var(--ds-color-nice-text);
+  box-shadow: var(--ds-shadow-liked);
+}
+
+.nice-button:active:not(:disabled) {
+  transform: translateY(var(--ds-press-offset)) scale(var(--ds-press-scale));
 }
 
 .nice-button:disabled {
-  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nice-button__visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  /* トークン定義どおり sm が「カード内のナイスボタン」用 */
+  width: var(--ds-like-chick-sm);
+  height: var(--ds-like-chick-sm);
+}
+
+.nice-button--lg .nice-button__visual {
+  width: var(--ds-like-chick-lg);
+  height: var(--ds-like-chick-lg);
+}
+
+.nice-button__chick {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  /* タップの当たり判定はボタンに任せる。画像自身がイベント対象になると
+     ドラッグや長押しの対象として扱われる */
+  pointer-events: none;
+  /* 未ナイスは彩度を落として静かに待たせる */
+  filter: saturate(0.45);
+  transition: filter var(--ds-duration-state) var(--ds-ease-default);
+}
+
+.nice-button--active .nice-button__chick {
+  filter: none;
+}
+
+.nice-button__chick--burst {
+  filter: none;
+  animation: ds-chick-jump var(--ds-duration-burst) var(--ds-ease-out-back) both;
+}
+
+.nice-button__chick--shrink {
+  animation: ds-chick-shrink var(--ds-duration-shrink) var(--ds-ease-default) both;
+}
+
+.nice-button__particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -6px;
+  margin-top: -6px;
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0;
+  animation: ds-burst-particle var(--ds-duration-particle) var(--ds-ease-out) forwards;
+}
+
+.nice-button__count {
+  display: inline-block;
+  font-family: var(--ds-font-numeric);
+  font-size: 15px;
+  font-weight: var(--ds-font-weight-numeric);
+  animation: ds-count-up var(--ds-duration-count) var(--ds-ease-count) both;
+}
+
+.nice-button--lg .nice-button__count {
+  font-size: var(--ds-font-size-lg);
 }
 
 /* ---------- 投稿完了(/posts/complete) ---------- */
@@ -203,11 +300,151 @@
   color: var(--color-primary);
 }
 
+/* ページ末尾の退避操作。投稿一覧と罫線で区切って控えめに置く。
+   下の余白は .page の padding-bottom(TabBar分)が担うので足さない */
+.profile-page__logout {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ---------- ログイン・新規登録(/login, /signup) ---------- */
+/* 未ログイン時は TabBar が出ないので、上のヘッダー(約50px)を除いた
+   残り全部を使って上下中央に置く。dvh はモバイルのアドレスバー伸縮に追従する */
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 56px);
+  min-height: calc(100dvh - 56px);
+  padding: var(--ds-space-2xl) var(--ds-space-screen-x) var(--ds-space-3xl);
+}
+
+/* カードは置かず、地の上に直接組む。まとまりは中央寄せと余白で作る */
+.auth-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-xl);
+  width: 100%;
+  /* 横に伸ばしすぎると入力欄が間延びするので、フォームとして読める幅で止める */
+  max-width: 380px;
+}
+
+/* 一枚絵。横長なので幅いっぱいに使い、上下にゆっくり浮かせる */
+.auth-hero {
+  width: 100%;
+  height: auto;
+  /* 小さい端末では絵より入力欄を優先したいので、上限を切る */
+  max-width: 320px;
+  animation: ds-float-y var(--ds-duration-float) var(--ds-ease-in-out) infinite;
+}
+
+.auth-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2xs);
+  text-align: center;
+}
+
+.auth-heading__title {
+  font-size: var(--ds-font-size-xl);
+  font-weight: var(--ds-font-weight-display);
+  line-height: var(--ds-line-height-tight);
+  color: var(--ds-color-text);
+}
+
+.auth-heading__lead {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-color-text-secondary);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-lg);
+  width: 100%;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-xs);
+}
+
+.auth-field > label {
+  font-size: var(--ds-font-size-sm);
+  font-weight: var(--ds-font-weight-bold);
+  color: var(--ds-color-text-secondary);
+}
+
+/* 16px を下回ると iOS Safari が focus 時に勝手にズームするので、
+   font-size は --ds-font-size-md(16px) から下げないこと。
+   カードが無くなり地(淡い黄)に直接載るので、入力欄の面は白にして
+   「ここに書ける」ことを面の差で示す */
+.auth-field > input {
+  width: 100%;
+  min-height: var(--ds-tap-target-min);
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: var(--ds-font-size-md);
+  color: var(--ds-color-text);
+  background: var(--ds-color-surface);
+  border: none;
+  border-radius: var(--ds-radius-sm);
+  box-shadow: var(--ds-border-inset);
+  transition: box-shadow var(--ds-duration-fast) var(--ds-ease-default);
+}
+
+.auth-field > input::placeholder {
+  color: var(--ds-color-text-muted);
+}
+
+.auth-field > input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1.5px var(--ds-color-action);
+}
+
+.auth-form__submit {
+  width: 100%;
+}
+
+/* .error-message は既定で上下 margin を持つ。ここは gap で間隔を作るので打ち消す */
+.auth-form .error-message {
+  margin: 0;
+}
+
+.auth-switch {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-color-text-secondary);
+  text-align: center;
+}
+
+.auth-switch a {
+  color: var(--ds-color-action);
+  font-weight: var(--ds-font-weight-bold);
+}
+
 /* ---------- 募集(/recruitments) ---------- */
+/* 見出しは line-height ぶんの余白を上下に持つので、ボタンを中央で揃えると
+   文字に対して下がって見える。文字の上端側へ引き上げる。
+   大きさは button--sm(31px)と既定(50px)の中間。min-height:0 は
+   button--sm から効かせたままにして、ここでは余白と文字だけ上書きする */
+.recruitment-list-page .timeline-page__header .button {
+  margin-top: -20px;
+  padding: 12px 22px;
+  font-size: var(--ds-font-size-base);
+}
+
+/* カード間の間隔はここだけで持つ。
+   以前は .recruitment-card 側にも margin-bottom があり、gap と足されて
+   32px 空いていた */
 .recruitment-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--ds-space-lg);
 }
 
 .recruitment-detail__section {
@@ -344,23 +581,8 @@
   outline-offset: -1px;
 }
 
-/* ---------- ヘッダーの未読バッジ ---------- */
-.header__messages {
-  position: relative;
-}
-
-.header__badge {
-  display: inline-block;
-  min-width: 18px;
-  margin-left: 4px;
-  padding: 0 5px;
-  font-size: 11px;
-  line-height: 18px;
-  text-align: center;
-  color: var(--color-bg);
-  background-color: var(--color-error);
-  border-radius: var(--radius-tag);
-}
+/* 未読バッジはヘッダーからタブバーへ移したので、
+   .header__messages / .header__badge はここから削除した(.tab-bar__badge を参照) */
 
 /* ---------- 404 ---------- */
 .not-found-page {

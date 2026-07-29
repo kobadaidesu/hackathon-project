@@ -1,24 +1,21 @@
 // src/components/post/PostCard.tsx
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Post } from "../../types/post";
-import {
-  sendNiceChallenge,
-  removeNiceChallenge,
-  deletePost,
-} from "../../api/postApi";
+import { removeNiceChallenge, deletePost, sendNiceChallenge } from "../../api/postApi";
 import { Tag } from "../common/Tag";
-// 修正後
+import { NiceButton } from "./NiceButton";
 import { LEARNING_STAGE_LABELS } from "../../types/profile";
-import { POST_CATEGORY_LABELS } from "../../types/post";
 import { useAuth } from "../../contexts/AuthContext";
+import { MASCOT } from "../../lib/mascot";
+import { formatRelativeTime } from "../../lib/formatRelativeTime";
 
 type Props = {
   post: Post;
   // ナイス挑戦の結果を親(PostList)のstateに反映してもらうためのコールバック
   onUpdate: (updatedPost: Post) => void;
-  // 渡されたときだけ削除ボタンを出す。削除後に一覧から取り除くのは親の役目
+  // 渡されたときだけ削除メニューを出す。削除後に一覧から取り除くのは親の役目
   onDelete?: (postId: string) => void;
 };
 
@@ -27,21 +24,46 @@ export function PostCard({ post, onUpdate, onDelete }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // 外側クリックの判定に使う。ボタンとメニューをまとめて包む要素
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // 削除できるのは自分の投稿だけ(最終的な権限チェックはバックエンド側)
   const canDelete = Boolean(onDelete) && currentUser?.id === post.author.id;
+
+  // メニューが開いている間だけ、外側クリックとEscを拾う
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const handlePointerDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMenuOpen]);
 
   const handleDelete = async () => {
     if (isDeleting) return;
     if (!window.confirm("この投稿を削除しますか?")) return;
 
     setIsDeleting(true);
-    setError("");
     try {
       await deletePost(post.id);
       onDelete?.(post.id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "投稿の削除に失敗しました");
+      // カード内の赤字はナイス専用に残してあるので、削除の失敗はダイアログで知らせる
+      window.alert(e instanceof Error ? e.message : "投稿の削除に失敗しました");
       setIsDeleting(false);
     }
   };
@@ -72,79 +94,114 @@ export function PostCard({ post, onUpdate, onDelete }: Props) {
     }
   };
 
+  const stageLabel = post.author.learningStage
+    ? LEARNING_STAGE_LABELS[post.author.learningStage]
+    : null;
+  const timeLabel = formatRelativeTime(post.createdAt);
+  // 「個人開発に挑戦中・3時間前」の中黒区切り
+  const metaLabel = [stageLabel, timeLabel].filter(Boolean).join("・");
+  const hasTags = post.technologyTags.length > 0;
+
+  // 置き場所が2通りあるので、実体は1つにして参照だけ差し替える
+  const niceButton = (
+    <NiceButton
+      count={post.niceCount}
+      isNiced={post.isNicedByMe}
+      disabled={isSubmitting}
+      onToggle={handleNice}
+    />
+  );
+
   return (
-    <div className="post-card">
-      {/* ヘッダー:アイコン・表示名・学習段階 */}
+    <article className="post-card">
+      {/* ヘッダー:左にアイコン・表示名・学習段階/時刻、右に⋯ */}
       <div className="post-card__header">
-        {post.author.avatarUrl ? (
-          <img
-            src={post.author.avatarUrl}
-            alt=""
-            className="post-card__avatar"
-          />
-        ) : (
-          <div className="post-card__avatar post-card__avatar--placeholder" />
-        )}
-        <div>
-          <Link to={`/users/${post.author.id}`} className="post-card__author-name">
-            {post.author.displayName}
-          </Link>
-          {post.author.learningStage && (
-            <p className="post-card__learning-stage">
-              {LEARNING_STAGE_LABELS[post.author.learningStage]}
-            </p>
+        <div className="post-card__header-main">
+          <span className="post-card__avatar">
+            {post.author.avatarUrl ? (
+              <img src={post.author.avatarUrl} alt="" className="post-card__avatar-img" />
+            ) : (
+              // 未設定のときはマスコットで埋める(デザインの既定アバター)
+              <img src={MASCOT.idle} alt="" className="post-card__avatar-img post-card__avatar-img--mascot" />
+            )}
+          </span>
+
+          <span className="post-card__identity">
+            <Link to={`/users/${post.author.id}`} className="post-card__author-name">
+              {post.author.displayName}
+            </Link>
+            {metaLabel && <span className="post-card__meta">{metaLabel}</span>}
+          </span>
+        </div>
+
+        <div className="post-card__header-actions">
+          {canDelete && (
+            // ここでのクリックはカード内のリンクへ伝播させない
+            <div
+              className="post-card__menu"
+              ref={menuRef}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="post-card__menu-button"
+                aria-label="投稿メニュー"
+                aria-haspopup="menu"
+                aria-expanded={isMenuOpen}
+                onClick={() => setIsMenuOpen((open) => !open)}
+              >
+                <span aria-hidden="true">⋯</span>
+              </button>
+
+              {isMenuOpen && (
+                <div className="post-card__menu-list" role="menu">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="post-card__menu-item post-card__menu-item--danger"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      handleDelete();
+                    }}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? "削除中..." : "削除"}
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
 
       {/* 投稿画像 */}
-      <img src={post.imageUrl} alt="" className="post-card__image" />
+      {post.imageUrl && <img src={post.imageUrl} alt="" className="post-card__image" />}
 
-      <div className="post-card__body">
-        {/* カテゴリ */}
-        <span className="post-card__category">
-          {POST_CATEGORY_LABELS[post.category]}
-        </span>
+      {/* タグがあれば本文の下に帯を作り、左にタグ・右にナイス。
+          タグが無いときは帯を作らず本文の右へ置く。
+          帯にナイスだけが乗ると、本文との間に用の無い空白ができるため */}
+      {hasTags ? (
+        <>
+          <p className="post-card__content">{post.content}</p>
 
-        {/* 本文 */}
-        <p className="post-card__content">{post.content}</p>
+          <div className="post-card__meta-row">
+            <div className="post-card__tags">
+              {post.technologyTags.map((tag) => (
+                <Tag key={tag} label={tag} />
+              ))}
+            </div>
 
-        {/* 技術タグ */}
-        {post.technologyTags.length > 0 && (
-          <div className="post-card__tags">
-            {post.technologyTags.map((tag) => (
-              <Tag key={tag} label={tag} />
-            ))}
+            {niceButton}
           </div>
-        )}
-
-        {/* ナイス挑戦ボタン */}
-        <div className="post-card__footer">
-          <button
-            type="button"
-            className={`nice-button ${
-              post.isNicedByMe ? "nice-button--active" : ""
-            }`}
-            onClick={handleNice}
-            disabled={isSubmitting}
-          >
-            {post.isNicedByMe ? "✓ ナイス挑戦" : "ナイス挑戦"} {post.niceCount}
-          </button>
-
-          {canDelete && (
-            <button
-              type="button"
-              className="button button--danger"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "削除中..." : "削除"}
-            </button>
-          )}
+        </>
+      ) : (
+        <div className="post-card__content-row">
+          <p className="post-card__content">{post.content}</p>
+          {niceButton}
         </div>
+      )}
 
-        {error && <p className="post-card__error">{error}</p>}
-      </div>
-    </div>
+      {error && <p className="post-card__error">{error}</p>}
+    </article>
   );
 }

@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .env
+
+# トリミング前のマスコット原本(退避用・コミット不要)
+public/images/_original/

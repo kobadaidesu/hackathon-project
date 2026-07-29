@@ -10,10 +10,8 @@ from app.services.user_service import _get_character_stage
 
 # 作成時の画像の受け取りのためにバラバラで受け取るようにする
 def create_post(content: str, category: PostCategory, user_id: str, technology_ids: list[int], image_file: UploadFile = None, db_session: Session = None):
-    # posts.image_url は NOT NULL なので画像は必須
-    if image_file is None:
-        raise HTTPException(status_code=400, detail="画像を選択してください")
-    image_url = _validate_and_upload_image(image_file, user_id)
+    # 画像は任意。付いていないときだけアップロードを丸ごと飛ばす
+    image_url = _validate_and_upload_image(image_file, user_id) if image_file else None
 
     tags = db_session.query(tech_model.TechTag).filter(tech_model.TechTag.id.in_(technology_ids)).all()
     if technology_ids and len(tags) != len(technology_ids):
@@ -54,7 +52,7 @@ def create_post(content: str, category: PostCategory, user_id: str, technology_i
         category=new_post.category,
         technology_tags=tags,
         nice_count=0,
-        is_niced_by_me=False,  # 投稿作成時点では自分の投稿にいいねはできないのでFalse
+        is_niced_by_me=False,  # 作成直後はまだ誰もナイスを押していないのでFalse
         created_at=new_post.created_at
     )
 
@@ -146,9 +144,6 @@ def toggle_nice(db_session: Session, post_id: str, current_user_id: str):
     post = db_session.query(post_model.Posts).filter(post_model.Posts.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-
-    if str(post.user_id) == str(current_user_id):
-        raise HTTPException(status_code=400, detail="自分の投稿にはナイス挑戦を送れません")
 
     already_niced = (
         db_session.query(nice_model.NiceChallenge)

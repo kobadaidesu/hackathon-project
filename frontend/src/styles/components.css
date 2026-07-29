@@ -15,79 +15,260 @@
 /* ============================================================
    Header
    ============================================================ */
+/* デザインは下部タブバー方式なので、上部は細い帯に留める。
+   罫線は引かず、地の色との差だけで浮かせる。 */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  background: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  gap: var(--ds-space-md);
+  padding: var(--ds-space-md) var(--ds-space-screen-x);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  background: transparent;
 }
 
+/* ワードマーク画像。高さを決めて幅は成り行きにする */
 .header__logo {
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
 }
 
-.header__actions {
+.header__logo img {
+  width: auto;
+  height: 26px;
+}
+
+/* ============================================================
+   TabBar(StyleGuide 07)
+   4タブ＋中央の投稿ボタン。アクティブのみアクセント色。
+   ============================================================ */
+.tab-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 10px 12px calc(14px + env(safe-area-inset-bottom, 0px));
+  /* backdrop-filter が使えない環境ではここで止まる。
+     半透明だけ効いて背後が素通しになると文字が読めなくなるので、
+     フォールバックは不透明のまま */
+  background: var(--ds-color-surface);
+  box-shadow: var(--ds-shadow-tabbar);
+  border-radius: var(--ds-radius-2xl) var(--ds-radius-2xl) 0 0;
+}
+
+/* すりガラス。背後を流れるコンテンツをぼかして透かす。
+   上端のハイライトでガラスの縁を作る */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tab-bar {
+    background: var(--ds-glass-bg);
+    -webkit-backdrop-filter: var(--ds-glass-blur);
+    backdrop-filter: var(--ds-glass-blur);
+    box-shadow:
+      var(--ds-shadow-tabbar),
+      inset 0 1px 0 var(--ds-glass-hairline);
+  }
+}
+
+.tab-bar__item {
   display: flex;
-  gap: var(--spacing-sm);
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 0;
+  color: var(--ds-color-tab-idle);
+  transition: color var(--ds-duration-state) var(--ds-ease-default);
+}
+
+.tab-bar__item--active {
+  color: var(--ds-color-action);
+}
+
+/* マスコットのPNGなので currentColor では色が変わらない。
+   選択状態は彩度と濃さで示す(NiceButton の未ナイスひよこと同じ扱い) */
+.tab-bar__icon {
+  width: var(--ds-tab-icon-size);
+  height: var(--ds-tab-icon-size);
+  object-fit: contain;
+  filter: saturate(0.3) opacity(0.55);
+  transition: filter var(--ds-duration-state) var(--ds-ease-default);
+}
+
+.tab-bar__item--active .tab-bar__icon {
+  filter: none;
+}
+
+.tab-bar__label {
+  font-size: var(--ds-font-size-2xs);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: 1;
+}
+
+/* バッジをアイコンの右上に置くための基準 */
+.tab-bar__icon-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.tab-bar__badge {
+  position: absolute;
+  top: -4px;
+  right: -10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-cheek-pink);
+  color: #ffffff;
+  font-family: var(--ds-font-numeric);
+  font-size: var(--ds-font-size-2xs);
+  font-weight: var(--ds-font-weight-numeric);
+  line-height: 1;
+}
+
+.tab-bar__fab-slot {
+  display: grid;
+  place-items: center;
+}
+
+.tab-bar__fab {
+  display: grid;
+  place-items: center;
+  width: var(--ds-fab-size);
+  height: var(--ds-fab-size);
+  margin-bottom: 4px;
+  border-radius: var(--ds-radius-circle);
+  background: var(--ds-color-action);
+  color: #ffffff;
+  box-shadow: var(--ds-shadow-fab);
+  transition:
+    background var(--ds-duration-state) var(--ds-ease-default),
+    transform var(--ds-duration-press) var(--ds-ease-default);
+}
+
+.tab-bar__fab:hover {
+  background: var(--ds-color-action-hover);
+  color: #ffffff;
+}
+
+.tab-bar__fab:active {
+  transform: translateY(var(--ds-press-offset));
 }
 
 /* ============================================================
    Button(variant対応:primary / secondary / danger)
+   デザイン適用済み。すべてピル型・枠線は使わず inset shadow で表現する。
+   押下は共通で translateY(2px)。
    ============================================================ */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 20px;
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  border-radius: var(--radius-button);
-  border: 1px solid transparent;
+  gap: var(--ds-space-sm);
+  /* 高さ 48-52px は padding で作る。最小タップ領域 44px を下回らない */
+  min-height: var(--ds-tap-target-min);
+  padding: 14px 28px;
+  font-family: var(--ds-font-base);
+  font-size: var(--ds-font-size-md);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: 1;
+  border: none;
+  border-radius: var(--ds-radius-pill);
   cursor: pointer;
-  transition: opacity 0.15s ease, background-color 0.15s ease;
+  transition:
+    background var(--ds-duration-tag) var(--ds-ease-default),
+    color var(--ds-duration-tag) var(--ds-ease-default),
+    box-shadow var(--ds-duration-fast) var(--ds-ease-default),
+    transform var(--ds-duration-press) var(--ds-ease-default);
+
+  /* variant 未指定 = ゴースト(キャンセル相当) */
+  background: var(--ds-color-surface);
+  color: var(--ds-color-text-secondary);
+  box-shadow: var(--ds-border-inset);
+}
+.button:hover:not(:disabled) {
+  color: var(--ds-color-accent);
 }
 
-.button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+/* 小さめ。カード内に収めたいとき用 */
+.button--sm {
+  padding: 9px 18px;
+  min-height: 0;
+  font-size: var(--ds-font-size-sm);
 }
 
 .button--primary {
-  background: var(--color-primary);
+  background: var(--ds-color-accent);
   color: #ffffff;
+  box-shadow: var(--ds-shadow-cta);
 }
 .button--primary:hover:not(:disabled) {
-  background: #0052bd; /* --color-primaryを少し暗くした固定値。変数化するなら --color-primary-dark を検討 */
+  background: var(--ds-color-accent-hover);
+  color: #ffffff;
+}
+.button--primary:active:not(:disabled) {
+  box-shadow: var(--ds-shadow-cta-pressed);
 }
 
 .button--secondary {
-  background: var(--color-bg);
-  color: var(--color-text);
-  border-color: var(--color-border);
+  background: var(--ds-color-accent-tint);
+  color: var(--ds-color-accent-strong);
+  box-shadow: none;
 }
 .button--secondary:hover:not(:disabled) {
-  background: var(--color-surface);
+  background: var(--ds-color-accent-tint-hover);
+  color: var(--ds-color-accent-strong);
 }
 
+/* デザインに danger は無いので、カテゴリ「エラー・困りごと」の配色を流用 */
 .button--danger {
-  background: var(--color-bg);
-  color: var(--color-error);
-  border-color: var(--color-error);
+  background: var(--ds-color-category-pink-bg);
+  color: var(--ds-color-category-pink-text);
+  box-shadow: none;
 }
 .button--danger:hover:not(:disabled) {
-  background: var(--color-error-soft);
+  background: #fbe1de; /* --ds-color-category-pink-bg を一段濃くした値 */
+  color: var(--ds-color-category-pink-text);
 }
 
 .button--active {
-  background: var(--color-accent);
+  background: var(--ds-color-accent);
   color: #ffffff;
+  box-shadow: var(--ds-shadow-cta);
+}
+
+/* 画面内の主導線。タブバーの投稿ボタンと同じ青で「押すもの」として揃える */
+.button--action {
+  background: var(--ds-color-action);
+  color: #ffffff;
+  box-shadow: var(--ds-shadow-fab);
+}
+.button--action:hover:not(:disabled) {
+  background: var(--ds-color-action-hover);
+  color: #ffffff;
+}
+
+/* 押下(Linkにも効かせたいので :disabled を除外した形で最後に置く) */
+.button:active:not(:disabled) {
+  transform: translateY(var(--ds-press-offset));
+}
+
+/* variant より詳細度が高いので、ここで一括して上書きできる */
+.button:disabled {
+  background: var(--ds-color-pending-bg);
+  color: var(--ds-color-pending-text);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* ============================================================
@@ -117,90 +298,287 @@
 /* ============================================================
    Tag
    ============================================================ */
+/* 技術タグ。デザインでは技術名だけ JetBrains Mono で組む */
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
-  font-size: var(--font-size-sm);
-  border-radius: var(--radius-tag);
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
-  margin: 2px 4px 2px 0;
+  /* ロゴと技術名の間隔 */
+  gap: 6px;
+  /* 左右はスマホ幅で横に並ぶ数を稼ぐため詰める。
+     上下はロゴが窮屈に見えない高さを確保する */
+  padding: 7px 11px;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-font-size-code-sm);
+  line-height: 1.4;
+  border-radius: var(--ds-radius-pill);
+  /* 多色の公式ロゴを並べる面なので、アプリの配色とは独立させてある。
+     アクセントを変えてもここは動かない(--ds-color-tag-* を参照) */
+  background: var(--ds-color-tag-bg);
+  color: var(--ds-color-tag-text);
+  /* 間隔は親側の gap に任せる(.tag-list / .post-card__tags) */
+  margin: 0;
+  transition:
+    background var(--ds-duration-tag) var(--ds-ease-default),
+    color var(--ds-duration-tag) var(--ds-ease-default);
 }
 
-.tag--selected {
-  background: var(--color-primary);
-  color: #ffffff;
+/* ロゴが付くぶん左が窮屈になるので、そちら側だけ詰めて左右の重心を揃える。
+   ロゴ無しのタグ(AWS・SQL など)は左右対称のままにしたいのでクラスを分ける */
+.tag--with-logo {
+  padding-left: 8px;
 }
 
+/* 公式ロゴ。色は Tag.tsx が inline style で当てる(ブランドカラー / 選択中は文字色)。
+   14px は技術名(12px)の約1.2倍。行ボックス(16.8px)に収まるので
+   タグの高さを押し広げない */
+.tag__logo {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+/* Tag.tsx は onClick があるときだけ role="button" を付ける */
+.tag[role="button"] {
+  cursor: pointer;
+}
+
+/* カテゴリ(和文なので基本書体に戻す) */
 .tag--category {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  font-family: var(--ds-font-base);
+  font-size: var(--ds-font-size-sm);
+  font-weight: var(--ds-font-weight-bold);
+  background: var(--ds-color-category-yellow-bg);
+  color: var(--ds-color-category-yellow-text);
+}
+
+/* --category との併用時も選択状態が勝つよう最後に置く */
+.tag--selected {
+  background: var(--ds-color-tag-selected-bg);
+  color: #ffffff;
 }
 
 /* ============================================================
    PostCard
+   デザイン適用済み。カード内の縦間隔は gap で一括して持つので、
+   子要素側に margin を積まない。
    ============================================================ */
+/* 面も影も持たせず、地の色をそのまま透かす。
+   「1件のまとまり」は上下の余白と、投稿間の罫線1本だけで伝える。
+   画面の左右の余白は .page が持つ。
+   左のパディングで画像・本文・タグをまとめて右へ送る。子ごとに
+   margin-left を足すのではなくここで持たせることで、width:100% の
+   画像もインデント後の幅で正しく収まる */
 .post-card {
-  background: var(--color-bg);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  background: transparent;
+  padding: var(--ds-space-xl) 0 var(--ds-space-xl) var(--ds-post-body-indent);
 }
 
+/* 隣接セレクタなので、先頭の上と末尾の下には線が出ない。
+   リストを枠で囲ったように見せないための書き方 */
+.post-card + .post-card {
+  border-top: 1px solid var(--ds-color-border);
+}
+
+/* 左(アバター・名前・時刻)と右(⋯)を両端に振り分ける。
+   負のマージンでインデントぶんだけ戻し、この行はカードの左端から始める。
+   結果、アバターがインデントの外に出て、本文・画像・タグだけが右へ送られる */
 .post-card__header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: var(--spacing-sm);
+  justify-content: space-between;
+  gap: 11px;
+  margin-left: calc(-1 * var(--ds-post-body-indent));
 }
 
+.post-card__header-main {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  /* 表示名が長いときに右側を押し出さない */
+  min-width: 0;
+}
+
+.post-card__header-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-sm);
+}
+
+/* ---------- ケバブメニュー(⋯) ---------- */
+.post-card__menu {
+  position: relative;
+  flex: none;
+}
+
+.post-card__menu-button {
+  display: grid;
+  place-items: center;
+  /* タップ領域は 44px を確保。アバター(40px)より高いぶんは margin で相殺し、
+     ヘッダー行の見た目の高さは変えない */
+  width: var(--ds-tap-target-min);
+  height: var(--ds-tap-target-min);
+  margin: -2px 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--ds-radius-circle);
+  background: transparent;
+  color: var(--ds-color-text-muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--ds-duration-state) var(--ds-ease-default),
+    color var(--ds-duration-state) var(--ds-ease-default);
+}
+
+/* 地が淡い黄になったので、hover は surface-tint では見えない。一段濃い方を使う */
+.post-card__menu-button:hover {
+  background: var(--ds-color-accent-tint);
+  color: var(--ds-color-text-secondary);
+}
+
+/* 後続のカードより上、TabBar(z-index 20)より下に出す */
+.post-card__menu-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  min-width: 132px;
+  padding: 6px;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-color-surface);
+  box-shadow: var(--ds-shadow-card-raised), var(--ds-border-inset);
+}
+
+.post-card__menu-item {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-family: var(--ds-font-base);
+  font-size: var(--ds-font-size-sm);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: 1;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--ds-color-text-secondary);
+  cursor: pointer;
+}
+
+.post-card__menu-item:hover:not(:disabled) {
+  background: var(--ds-color-surface-tint);
+}
+
+.post-card__menu-item:disabled {
+  color: var(--ds-color-text-muted);
+  cursor: not-allowed;
+}
+
+.post-card__menu-item--danger {
+  color: var(--color-error);
+}
+
+.post-card__menu-item--danger:hover:not(:disabled) {
+  background: var(--color-error-soft);
+}
+
+/* アバターは黄色い下地の丸にマスコットを乗せる形 */
 .post-card__avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--ds-avatar-md);
+  height: var(--ds-avatar-md);
+  border-radius: var(--ds-radius-circle);
+  overflow: hidden;
+  background: var(--ds-color-avatar-bg-yellow);
+}
+
+.post-card__avatar-img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  background: var(--color-surface);
+}
+
+/* マスコットは下地を見せたいので、枠いっぱいには広げない */
+.post-card__avatar-img--mascot {
+  width: 33px;
+  height: 33px;
+  object-fit: contain;
+}
+
+.post-card__identity {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .post-card__author-name {
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  color: var(--color-text);
+  font-size: var(--ds-font-size-base);
+  font-weight: var(--ds-font-weight-bold);
+  color: var(--ds-color-text);
 }
 
-.post-card__learning-stage {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+/* カード内の文字は本文・表示名と同じ黒でそろえる。
+   表示名との差は文字サイズ(15px と 12px)で付ける */
+.post-card__meta {
+  font-size: var(--ds-font-size-xs);
+  color: var(--ds-color-text);
 }
 
 /* 13章:投稿画像を大きく。global.css の --post-image-ratio を活用 */
 .post-card__image {
   width: 100%;
   aspect-ratio: var(--post-image-ratio);
-  border-radius: var(--post-image-radius);
-  margin-bottom: var(--spacing-sm);
+  border-radius: var(--ds-radius-sm);
   object-fit: cover;
 }
 
 .post-card__content {
-  font-size: var(--font-size-base);
-  color: var(--color-text);
-  margin-bottom: var(--spacing-sm);
+  font-size: 14.5px;
+  line-height: var(--ds-line-height-body-sm);
+  color: var(--ds-color-text);
   white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.post-card__footer {
+/* 本文の下の帯。技術タグは左、ナイスは右端。
+   スマホ幅でタグが入りきらないときは、タグを潰すのではなく
+   ナイスを次の行へ落として、タグ側に1行の幅を丸ごと渡す */
+.post-card__meta-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--ds-space-md);
 }
 
-.post-card__nice-count {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  margin-left: 6px;
+/* タグが無い投稿でもナイスが右端に来るよう、押し出しはボタン側で持つ */
+.post-card__meta-row .nice-button {
+  flex: none;
+  margin-left: auto;
+}
+
+/* タグが無い投稿。本文とナイスを1行に収めて、帯ぶんの空白を作らない */
+.post-card__content-row {
+  display: flex;
+  /* 本文が複数行になっても、ナイスは末尾の行の高さに揃える */
+  align-items: flex-end;
+  gap: var(--ds-space-md);
+}
+
+.post-card__content-row .post-card__content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.post-card__content-row .nice-button {
+  flex: none;
 }
 
 /* ============================================================
@@ -228,18 +606,20 @@
 .character-display__exp-bar {
   width: 100%;
   max-width: 240px;
-  height: 10px;
-  background: var(--color-surface);
-  border-radius: var(--radius-tag);
+  height: var(--ds-progress-height);
+  background: var(--ds-color-progress-track);
+  border-radius: var(--ds-radius-pill);
   overflow: hidden;
-  margin-top: var(--spacing-sm);
+  margin-top: var(--ds-space-sm);
+  /* 溝の縁を1本入れて、地に溶けないようにする */
+  box-shadow: inset 0 0 0 1px rgba(36, 114, 200, 0.16);
 }
 
 .character-display__exp-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-  border-radius: var(--radius-tag);
-  transition: width 0.3s ease;
+  background: var(--ds-gradient-progress);
+  border-radius: var(--ds-radius-pill);
+  transition: width var(--ds-duration-count) var(--ds-ease-default);
 }
 
 .character-display__exp-label {
@@ -258,75 +638,116 @@
 /* ============================================================
    RecruitmentCard
    ============================================================ */
+/* PostCard と同じ流儀にそろえる。面・角丸・影は card-base に任せ、
+   ここは中の並びだけ持つ。子に margin を積まず gap で通す。
+   (以前は独自に --radius-card 12px と旧影を上書きしていて、
+    投稿カードだけ角丸20pxという不揃いになっていた) */
 .recruitment-card {
-  background: var(--color-bg);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-sm);
+  padding: var(--ds-space-card-y) var(--ds-space-card-x);
+  transition: box-shadow var(--ds-duration-fast) var(--ds-ease-default);
+}
+
+.recruitment-card:hover {
+  box-shadow: var(--ds-shadow-card-raised);
 }
 
 .recruitment-card__title {
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  color: var(--color-text);
-  margin-bottom: 4px;
+  font-size: var(--ds-font-size-md);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: var(--ds-line-height-heading);
+  color: var(--ds-color-text);
 }
 
 .recruitment-card__owner {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-sm);
+  font-size: var(--ds-font-size-xs);
+  color: var(--ds-color-text-muted);
+  /* 投稿者名はタイトルに属する情報なので、gap ぶんを詰めて近づける */
+  margin-top: calc(-1 * var(--ds-space-2xs));
 }
 
+/* 一覧では3行で打ち切る。カードの高さが揃って、並べたときに読みやすい */
 .recruitment-card__description {
-  font-size: var(--font-size-base);
-  color: var(--color-text);
-  margin-bottom: var(--spacing-sm);
+  font-size: 14.5px;
+  line-height: var(--ds-line-height-body-sm);
+  color: var(--ds-color-text);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
 
 .recruitment-card__footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--ds-space-sm);
+  font-size: var(--ds-font-size-xs);
+  color: var(--ds-color-text-secondary);
 }
 
 .recruitment-card__interest-count {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  font-size: var(--ds-font-size-xs);
+  color: var(--ds-color-text-secondary);
 }
 
+/* 募集中かどうかは一番見たい情報。項目数が可変なので space-between だと
+   位置が揃わない。ここだけ右端に固定して、カード間で目線を動かさずに済むようにする */
 .recruitment-card__status {
-  font-size: var(--font-size-sm);
-  padding: 2px 10px;
-  border-radius: var(--radius-tag);
+  margin-left: auto;
+  flex: none;
+  padding: 5px 11px;
+  border-radius: var(--ds-radius-pill);
+  font-size: var(--ds-font-size-xs);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 .recruitment-card__status--open {
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
+  background: var(--ds-color-accent-tint);
+  color: var(--ds-color-accent-strong);
 }
 
 .recruitment-card__status--closed {
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
+  background: var(--ds-color-category-idle-bg);
+  color: var(--ds-color-category-idle-text);
 }
 
 /* ============================================================
    空状態
+   デザイン06「まだ投稿がありません」のカード。
    ============================================================ */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px var(--spacing-md);
-  color: var(--color-text-secondary);
+  gap: 10px;
+  padding: 34px var(--ds-space-2xl);
+  background: var(--ds-color-surface);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-shadow-card);
+  color: var(--ds-color-text-muted);
   text-align: center;
 }
 
 .empty-state__image {
-  width: 80px;
-  height: 80px;
-  margin-bottom: var(--spacing-sm);
-  opacity: 0.8;
+  width: var(--ds-mascot-sm);
+  height: var(--ds-mascot-sm);
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+.empty-state__title {
+  font-size: var(--ds-font-size-base);
+  font-weight: var(--ds-font-weight-bold);
+  color: var(--ds-color-text);
+}
+
+.empty-state__hint {
+  font-size: var(--ds-font-size-sm);
+  line-height: var(--ds-line-height-body-sm);
 }

@@ -20,11 +20,9 @@ export function RecruitmentCard({ recruitment }: Props) {
     >
       <p className="recruitment-card__title">{recruitment.title}</p>
 
-      <p className="recruitment-card__owner">
-        {recruitment.owner.displayName}
-        {recruitment.owner.learningStage &&
-          `・${LEARNING_STAGE_LABELS[recruitment.owner.learningStage]}`}
-      </p>
+      {/* 募集主の学習段階は出さない。一覧で見たいのは「何を作るか」であって
+          相手の習熟度ではないので、名前だけに絞る */}
+      <p className="recruitment-card__owner">{recruitment.owner.displayName}</p>
 
       <p className="recruitment-card__description">{recruitment.description}</p>
 

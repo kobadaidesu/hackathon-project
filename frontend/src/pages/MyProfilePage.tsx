@@ -1,6 +1,6 @@
 // src/pages/MyProfilePage.tsx
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { ProfileView } from "../components/profile/ProfileView";
 import { Loading } from "../components/common/Loading";
@@ -8,7 +8,17 @@ import { Loading } from "../components/common/Loading";
 export function MyProfilePage() {
   // ProtectedRoute配下なのでcurrentUserは基本入っているが、
   // 再取得中に一瞬nullになりうるのでガードしておく
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      // 成否にかかわらずログイン画面へ戻す
+      navigate("/login", { replace: true });
+    }
+  };
 
   if (!currentUser) return <Loading />;
 
@@ -22,6 +32,15 @@ export function MyProfilePage() {
       </div>
 
       <ProfileView profile={currentUser} />
+
+      {/* ログアウトは滅多に使わないので、ページの一番下に控えめに置く。
+          ProfileView は他人のプロフィール(/users/:userId)とも共有しているので、
+          自分の画面であるここに直接書く */}
+      <div className="profile-page__logout">
+        <button type="button" className="button" onClick={handleLogout}>
+          ログアウト
+        </button>
+      </div>
     </div>
   );
 }

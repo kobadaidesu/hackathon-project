@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, UploadFile
 from app.models import users as user_model, tech_tags as tech_model  # DBモデル（SQLAlchemy）を読み込む
 from app.schemas.users import UserProfileUpdate, UserProfileResponse, CharacterStage, NextEvolution
-from app.constants import EVOLUTION_THRESHOLD, AVATAR_BUCKET
+from app.constants import EVOLUTION_THRESHOLD, MAX_CHARACTER_LEVEL, AVATAR_BUCKET
 from app.services import storage_service
 
 def get_user_profile(db_session: Session, user_id: str):
@@ -69,15 +69,18 @@ def _to_get_user_profile(user: user_model.Users):
     
     character_stage = _get_character_stage(user.experience_points)
     
-    current_level_exp = user.experience_points % EVOLUTION_THRESHOLD
-    required = EVOLUTION_THRESHOLD - current_level_exp
-    # NextEvolution.progress_percentは0〜100の整数
-    progress_percent = int(current_level_exp / EVOLUTION_THRESHOLD * 100)
-
-    next_evolution = NextEvolution(
-        required=required,
-        progress_percent=progress_percent
-    )
+    # 最終段階に達したら「次」は無いので満杯で固定する。
+    # exp % THRESHOLD のままだと、上限後も 0% に戻って伸び直してしまい、
+    # 起きない進化を待っているように見える
+    if user.experience_points // EVOLUTION_THRESHOLD >= MAX_CHARACTER_LEVEL:
+        next_evolution = NextEvolution(required=0, progress_percent=100)
+    else:
+        current_level_exp = user.experience_points % EVOLUTION_THRESHOLD
+        next_evolution = NextEvolution(
+            required=EVOLUTION_THRESHOLD - current_level_exp,
+            # NextEvolution.progress_percentは0〜100の整数
+            progress_percent=int(current_level_exp / EVOLUTION_THRESHOLD * 100),
+        )
     
     is_completed = bool(user.display_name) # 要検討？
     
@@ -99,9 +102,11 @@ def _to_get_user_profile(user: user_model.Users):
     return user_profile_response
 
 def _get_character_stage(exp: int) -> CharacterStage:
-    level = exp // EVOLUTION_THRESHOLD
-    if level == 0:
-        return CharacterStage.EGG
-    else:
-        return CharacterStage.CHICK
-    # レベル上限が解放されたら、ここに追記する
+    """経験値から段階を引く。上限に達したらそこで止まる。
+
+    段階を増やすときは CharacterStage に値を足して
+    MAX_CHARACTER_LEVEL を上げるだけでよい。
+    """
+    stages = list(CharacterStage)
+    level = min(exp // EVOLUTION_THRESHOLD, MAX_CHARACTER_LEVEL)
+    return stages[level]

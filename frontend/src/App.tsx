@@ -16,6 +16,7 @@ import { MessageThreadPage } from "./pages/MessageThreadPage"
 import { NotFoundPage } from "./pages/NotFoundPage"
 import { ProtectedRoute } from "./components/common/ProtectedRoute"
 import { Header } from "./components/common/Header"
+import { TabBar } from "./components/common/TabBar"
 
 function App() {
   return (
@@ -42,6 +43,8 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
 
         </Routes>
+        {/* 下部タブバー。未ログイン時はTabBar側で描画しない分岐がある */}
+        <TabBar />
       </BrowserRouter>
     </AuthProvider>
   );

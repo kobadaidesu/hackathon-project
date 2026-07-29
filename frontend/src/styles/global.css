@@ -7,17 +7,20 @@
 
 :root {
   /* --- 色 --- */
+  /* ひよこ配色(茶)。--ds-* 側(tokens.css)と対になる値。
+     --color-bg は「白」として文字色にも使われているので白のまま据え置く */
   --color-bg: #ffffff; /* 白基調 */
-  --color-surface: #F7FAFE;   /* カード等の下地(白よりわずかに青み) */
-  --color-primary: #0066eb;    /* ブルー(メイン) */
-  --color-primary-soft: #eaf1ff;     /* ★追加:ボタンhoverやタグ背景用 */
-  --color-accent: #AFA9EC;           /* ★コメントアウト解除:パープル差し色を実際に使う */
-  --color-accent-soft: #f2edfb;      /* ★追加:カテゴリタグ背景用 */
-  --color-text: #2C2C2A;
-  --color-text-secondary: #6B6B68;
-  --color-border: #E3ECF5;
+  --color-surface: #FBF4E6;   /* カード等の下地(白よりわずかに黄み) */
+  --color-primary: #8A5F3C;    /* ブラウン(メイン) */
+  --color-primary-soft: #F5E8D5;     /* ボタンhoverやタグ背景用 */
+  --color-accent: #C9A57B;           /* 明るい茶。グラデーションの明側・差し色 */
+  --color-accent-soft: #F7EFDF;      /* カテゴリタグ背景用 */
+  --color-text: #000000;
+  --color-text-secondary: #8A7A66;
+  --color-border: #EFE3CC;
+  /* エラーは意味づけの色なので配色変更の対象外(赤のまま) */
   --color-error: #E24B4A;
-  --color-error-soft: #fdeceb;       /* ★追加:エラーメッセージ背景用 */
+  --color-error-soft: #fdeceb;       /* エラーメッセージ背景用 */
 
   /* --- 角丸 --- */
   --radius-card: 12px;
@@ -45,13 +48,14 @@
   --character-size-sm: 48px;
 
   /* --- 影 --- */
-  --shadow-card: 0 2px 8px rgba(44, 44, 42, 0.06);
+  --shadow-card: 0 2px 8px rgba(138, 95, 60, 0.08);
 
   /* --- レイアウト --- */
   --max-width: 640px;
 
   /* --- フォント --- */
-  --font-family-base: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  /* デザイン適用: 本文は Zen Maru Gothic。読み込み失敗時は従来のシステムフォントに落ちる */
+  --font-family-base: var(--ds-font-base);
 }
 
 /* ---------- リセット ---------- */
@@ -74,6 +78,26 @@ button {
   cursor: pointer;
 }
 
+/* モバイルでタップした瞬間に出る四角いハイライトを消す。
+   角丸を無視した矩形で描かれるので、ピル型のボタンだと形が合わない。
+   押した感触は各要素の :active(translateY) が持っているので支障はない */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* フォーム部品はブラウザ既定の書体・サイズを持っていて body から継承しない。
+   .form-group の外に素で置かれた input(ログイン・新規登録・DM入力など)が
+   標準ゴシックのままになるので、ここで丸ゴシックに揃える */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -81,8 +105,10 @@ a {
 
 /* ---------- body/html全体 ---------- */
 html, body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  /* デザイン適用: 地は淡ブルー。白はカードのために取っておく。
+     --color-bg は「白」としてカードや文字色に使われているので触らない */
+  background-color: var(--ds-color-base);
+  color: var(--ds-color-text);
   font-family: var(--font-family-base);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -98,7 +124,8 @@ html, body {
 /* ---------- 柔らかい雰囲気の基調となるカードの土台 ---------- */
 /* 個別のpaddingやレイアウトはcomponents.css側で調整する前提の「素地」のみ */
 .card-base {
-  background-color: var(--color-surface);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  /* デザイン適用: 純白 / 角丸20px / 薄いブルーの影 / 枠線なし */
+  background-color: var(--ds-color-surface);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-shadow-card);
 }

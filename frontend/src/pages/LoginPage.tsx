@@ -1,69 +1,98 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { Button } from '../components/common/Button';
-import { ErrorMessage } from '../components/common/ErrorMessage';
-import { Loading } from '../components/common/Loading';
+// src/pages/LoginPage.tsx
+// 未ログインで最初に見る画面なので、上部ヘッダー以外は何も置かず
+// カード1枚を画面の中央に据える。
+
+import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { ErrorMessage } from "../components/common/ErrorMessage";
+import { ILLUSTRATION } from "../lib/mascot";
 
 export function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async () => {
+  // form の onSubmit にすることで、入力欄でEnterを押しても送信できる
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
     if (!email || !password) {
-      setError('メールアドレスとパスワードを入力してください');
+      setError("メールアドレスとパスワードを入力してください");
       return;
     }
-    setError('');
+    setError("");
     setIsSubmitting(true);
     try {
       await login(email, password);
-      navigate('/');
+      navigate("/");
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'ログインに失敗しました');
+      setError(e instanceof Error ? e.message : "ログインに失敗しました");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <h1>ログイン</h1>
-
-      <div>
-        <label htmlFor="email">メールアドレス</label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+    <div className="auth-page">
+      <div className="auth-body">
+        <img
+          src={ILLUSTRATION.login}
+          alt=""
+          className="auth-hero"
+          width={720}
+          height={450}
         />
+
+        <div className="auth-heading">
+          <h1 className="auth-heading__title">おかえりなさい</h1>
+          <p className="auth-heading__lead">今日の学びを残していきましょう</p>
+        </div>
+
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label htmlFor="email">メールアドレス</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              placeholder="you@example.com"
+            />
+          </div>
+
+          <div className="auth-field">
+            <label htmlFor="password">パスワード</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              placeholder="8文字以上"
+            />
+          </div>
+
+          {error && <ErrorMessage message={error} />}
+
+          <button
+            type="submit"
+            className="button button--action auth-form__submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "ログイン中..." : "ログイン"}
+          </button>
+        </form>
+
+        <p className="auth-switch">
+          アカウントをお持ちでない方は <Link to="/signup">こちらから登録</Link>
+        </p>
       </div>
-
-      <div>
-        <label htmlFor="password">パスワード</label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-
-      {error && <ErrorMessage message={error} />}
-      {isSubmitting && <Loading />}
-
-      <Button onClick={handleSubmit} disabled={isSubmitting}>
-        ログイン
-      </Button>
-
-      <p>
-        アカウントをお持ちでない方は <a href="/signup">こちらから登録</a>
-      </p>
     </div>
   );
 }

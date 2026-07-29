@@ -10,8 +10,21 @@ app.add_middleware(
     CORSMiddleware,
     # 開発中はポートを問わない。
     # 5173が埋まっているとViteは5174で起動するため、決め打ちにすると
-    # ブラウザ側でプリフライトが弾かれて「Failed to fetch」になる
-    allow_origin_regex=r"http://localhost:\d+",
+    # ブラウザ側でプリフライトが弾かれて「Failed to fetch」になる。
+    #
+    # localhost に加えて 127.0.0.1 とプライベートIP(RFC1918)も許可する。
+    # 実機確認でスマホから開くと Origin が http://192.168.x.x:5173 になり、
+    # localhost 決め打ちだと全リクエストがプリフライトで落ちるため。
+    # グローバルIPは意図的に入れていない(外から叩けるようにしない)
+    allow_origin_regex=(
+        r"http://("
+        r"localhost"
+        r"|127\.0\.0\.1"
+        r"|10\.\d{1,3}\.\d{1,3}\.\d{1,3}"
+        r"|192\.168\.\d{1,3}\.\d{1,3}"
+        r"|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}"
+        r"):\d+"
+    ),
     allow_origins=[],  # デプロイ時にVercelのURLをここへ追加
     allow_credentials=True,
     allow_methods=["*"],

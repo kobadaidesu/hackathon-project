@@ -16,8 +16,11 @@ class LearningStage(str, Enum):
 
 
 class CharacterStage(str, Enum):
-    EGG = "egg"
-    CHICK = "chick"
+    """経験値 EVOLUTION_THRESHOLD ごとに1段階進む。順序はこの定義順"""
+
+    EGG = "egg"            # レベル0: 殻から顔だけ
+    HATCHING = "hatching"  # レベル1: 殻が割れて出てくる
+    CHICK = "chick"        # レベル2: 完全体(最終段階)
 
 
 class NextEvolution(ApiSchema):
