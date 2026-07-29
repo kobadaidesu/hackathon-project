@@ -100,6 +100,17 @@ export function PostCard({ post, onUpdate, onDelete }: Props) {
   const timeLabel = formatRelativeTime(post.createdAt);
   // 「個人開発に挑戦中・3時間前」の中黒区切り
   const metaLabel = [stageLabel, timeLabel].filter(Boolean).join("・");
+  const hasTags = post.technologyTags.length > 0;
+
+  // 置き場所が2通りあるので、実体は1つにして参照だけ差し替える
+  const niceButton = (
+    <NiceButton
+      count={post.niceCount}
+      isNiced={post.isNicedByMe}
+      disabled={isSubmitting}
+      onToggle={handleNice}
+    />
+  );
 
   return (
     <article className="post-card">
@@ -166,26 +177,29 @@ export function PostCard({ post, onUpdate, onDelete }: Props) {
       {/* 投稿画像 */}
       {post.imageUrl && <img src={post.imageUrl} alt="" className="post-card__image" />}
 
-      {/* 画像と本文の間の帯。左に技術タグ、右にナイス */}
-      <div className="post-card__meta-row">
-        {post.technologyTags.length > 0 && (
-          <div className="post-card__tags">
-            {post.technologyTags.map((tag) => (
-              <Tag key={tag} label={tag} />
-            ))}
+      {/* タグがあれば本文の下に帯を作り、左にタグ・右にナイス。
+          タグが無いときは帯を作らず本文の右へ置く。
+          帯にナイスだけが乗ると、本文との間に用の無い空白ができるため */}
+      {hasTags ? (
+        <>
+          <p className="post-card__content">{post.content}</p>
+
+          <div className="post-card__meta-row">
+            <div className="post-card__tags">
+              {post.technologyTags.map((tag) => (
+                <Tag key={tag} label={tag} />
+              ))}
+            </div>
+
+            {niceButton}
           </div>
-        )}
-
-        <NiceButton
-          count={post.niceCount}
-          isNiced={post.isNicedByMe}
-          disabled={isSubmitting}
-          onToggle={handleNice}
-        />
-      </div>
-
-      {/* 本文 */}
-      <p className="post-card__content">{post.content}</p>
+        </>
+      ) : (
+        <div className="post-card__content-row">
+          <p className="post-card__content">{post.content}</p>
+          {niceButton}
+        </div>
+      )}
 
       {error && <p className="post-card__error">{error}</p>}
     </article>

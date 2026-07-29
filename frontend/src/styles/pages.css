@@ -313,7 +313,8 @@ body:has(.tab-bar) .page {
   padding: var(--ds-space-2xl) var(--ds-space-screen-x) var(--ds-space-3xl);
 }
 
-.auth-card {
+/* カードは置かず、地の上に直接組む。まとまりは中央寄せと余白で作る */
+.auth-body {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -321,34 +322,32 @@ body:has(.tab-bar) .page {
   width: 100%;
   /* 横に伸ばしすぎると入力欄が間延びするので、フォームとして読める幅で止める */
   max-width: 380px;
-  padding: var(--ds-space-3xl) var(--ds-space-2xl);
-  background: var(--ds-color-surface);
-  border-radius: var(--ds-radius-2xl);
-  box-shadow: var(--ds-shadow-panel);
 }
 
-.auth-card__mascot {
-  width: var(--ds-mascot-sm);
-  height: var(--ds-mascot-sm);
-  object-fit: contain;
+/* 一枚絵。横長なので幅いっぱいに使い、上下にゆっくり浮かせる */
+.auth-hero {
+  width: 100%;
+  height: auto;
+  /* 小さい端末では絵より入力欄を優先したいので、上限を切る */
+  max-width: 320px;
   animation: ds-float-y var(--ds-duration-float) var(--ds-ease-in-out) infinite;
 }
 
-.auth-card__heading {
+.auth-heading {
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-2xs);
   text-align: center;
 }
 
-.auth-card__title {
+.auth-heading__title {
   font-size: var(--ds-font-size-xl);
   font-weight: var(--ds-font-weight-display);
   line-height: var(--ds-line-height-tight);
   color: var(--ds-color-text);
 }
 
-.auth-card__lead {
+.auth-heading__lead {
   font-size: var(--ds-font-size-sm);
   color: var(--ds-color-text-secondary);
 }
@@ -373,7 +372,9 @@ body:has(.tab-bar) .page {
 }
 
 /* 16px を下回ると iOS Safari が focus 時に勝手にズームするので、
-   font-size は --ds-font-size-md(16px) から下げないこと */
+   font-size は --ds-font-size-md(16px) から下げないこと。
+   カードが無くなり地(淡い黄)に直接載るので、入力欄の面は白にして
+   「ここに書ける」ことを面の差で示す */
 .auth-field > input {
   width: 100%;
   min-height: var(--ds-tap-target-min);
@@ -381,7 +382,7 @@ body:has(.tab-bar) .page {
   font-family: inherit;
   font-size: var(--ds-font-size-md);
   color: var(--ds-color-text);
-  background: var(--ds-color-surface-tint);
+  background: var(--ds-color-surface);
   border: none;
   border-radius: var(--ds-radius-sm);
   box-shadow: var(--ds-border-inset);
@@ -406,13 +407,13 @@ body:has(.tab-bar) .page {
   margin: 0;
 }
 
-.auth-card__switch {
+.auth-switch {
   font-size: var(--ds-font-size-sm);
   color: var(--ds-color-text-secondary);
   text-align: center;
 }
 
-.auth-card__switch a {
+.auth-switch a {
   color: var(--ds-color-action);
   font-weight: var(--ds-font-weight-bold);
 }

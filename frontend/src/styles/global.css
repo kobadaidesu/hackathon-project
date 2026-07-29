@@ -15,7 +15,7 @@
   --color-primary-soft: #F5E8D5;     /* ボタンhoverやタグ背景用 */
   --color-accent: #C9A57B;           /* 明るい茶。グラデーションの明側・差し色 */
   --color-accent-soft: #F7EFDF;      /* カテゴリタグ背景用 */
-  --color-text: #3A2E23;
+  --color-text: #000000;
   --color-text-secondary: #8A7A66;
   --color-border: #EFE3CC;
   /* エラーは意味づけの色なので配色変更の対象外(赤のまま) */

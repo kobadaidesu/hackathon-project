@@ -38,6 +38,24 @@
   --ds-color-nice-bg: var(--ds-color-tag-bg);
   --ds-color-nice-text: var(--ds-color-tag-text);
 
+  /* --- 操作の色(ブルー) ---
+     下部タブバーまわり、つまり「押すもの(投稿FAB)」と
+     「今どこにいるか(アクティブタブ)」を示す色。
+     地の配色(茶)に溶かさず濃い青で固定する。意図的にアクセントから切り離してある */
+  --ds-color-action: #2472C8;        /* 白・白地いずれとも4.9:1(AA) */
+  --ds-color-action-hover: #1E63B4;
+  /* 非アクティブのタブ。地の配色に合わせた茶。
+     text-muted(#B6A68F)より一段濃くして読めるようにしつつ、
+     アクティブの青(4.9:1)よりは明確に軽くして選択状態の差を保つ */
+  --ds-color-tab-idle: #A3937B;
+
+  /* --- すりガラス(タブバー) ---
+     純白だと暖色の地から浮くので、白そのものではなく黄みを残した白を透かす。
+     saturate を少し上げて、背後に流れる地の暖かさをガラス越しにも残す */
+  --ds-glass-bg: rgba(255, 252, 243, 0.72);
+  --ds-glass-blur: blur(18px) saturate(1.4);
+  --ds-glass-hairline: rgba(255, 255, 255, 0.55);
+
   /* --- 技術タグ ---
      公式ロゴを多色で並べる面なので、地は無彩色寄りの淡い青に固定する。
      アプリの配色を変えてもここは動かさない(意図的にアクセントから切り離してある) */
@@ -46,7 +64,7 @@
   --ds-color-tag-selected-bg: #5B8FD1;
 
   /* --- テキスト --- */
-  --ds-color-text: #3A2E23;
+  --ds-color-text: #000000;           /* 本文・見出し */
   --ds-color-text-secondary: #8A7A66; /* 副文・ラベル */
   --ds-color-text-muted: #B6A68F;     /* メタ情報・ヒント */
   --ds-color-text-chip: #6E5D48;      /* 学習段階チップの文字 */
@@ -106,7 +124,8 @@
   --ds-shadow-cta: 0 4px 12px rgba(138, 95, 60, 0.28);
   --ds-shadow-cta-lg: 0 8px 20px rgba(138, 95, 60, 0.30);
   --ds-shadow-cta-pressed: 0 1px 4px rgba(138, 95, 60, 0.28);
-  --ds-shadow-fab: 0 6px 16px rgba(138, 95, 60, 0.34);
+  /* FABは青なので影も青側。茶の影だと落ち影がにごる */
+  --ds-shadow-fab: 0 6px 16px rgba(36, 114, 200, 0.34);
   /* ナイス済だけはタグと同じ青側の影。茶の影が乗ると色がにごる */
   --ds-shadow-liked: 0 4px 12px rgba(54, 103, 159, 0.16);
   --ds-shadow-tabbar: 0 -2px 18px rgba(138, 95, 60, 0.12);
@@ -226,6 +245,10 @@
      ============================================================ */
   --ds-avatar-sm: 38px;
   --ds-avatar-md: 40px;
+  /* 投稿カードで、画像・本文・タグ・ナイスをまとめて右へ送る幅。
+     表示名にきっちり揃える(アバター40px + gap 11px = 51px)と
+     スマホ幅で本文が痩せすぎるので、浅めのインデントに留めている */
+  --ds-post-body-indent: 24px;
   --ds-avatar-lg: 44px;
   --ds-avatar-img-ratio: 0.82;     /* アバター枠に対する画像の実寸比(33/40) */
 
@@ -239,7 +262,9 @@
   --ds-like-chick-md: 30px;
   --ds-like-chick-lg: 34px;        /* 詳細画面 */
 
-  --ds-icon-size: 24px;            /* タブ・共通アイコン */
+  --ds-icon-size: 24px;            /* 共通アイコン(線画SVG) */
+  /* タブのマスコットアイコン。線画より情報量が多いので線画用より一回り大きく取る */
+  --ds-tab-icon-size: 28px;
   --ds-icon-stroke: 2;
   --ds-fab-size: 54px;             /* 中央の投稿ボタン */
   --ds-progress-height: 10px;
