@@ -6,3 +6,6 @@ build/
 __pycache__/
 .venv/
 .DS_Store
+
+# Claude Codeのローカル設定と作業用コピー(worktree)。個人の環境依存なので共有しない
+.claude/
