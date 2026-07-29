@@ -1,7 +1,7 @@
 // src/components/profile/CharacterDisplay.tsx
 // キャラクターと経験値バーの表示。プロフィール画面と投稿完了画面の両方で使う。
 //
-// 画像は public/images/character-{egg,hatching,chick}.png を参照する。
+// 画像は public/images/character-<段階名>.png を参照する。
 // 段階を増やすときは CharacterStage に値を足し、同名のPNGを置けばよい。
 // 読み込みに失敗した場合は絵文字にフォールバックする(壊れた画像アイコンを出さないため)。
 
@@ -9,18 +9,30 @@ import { useState } from "react";
 import type { CharacterStage } from "../../types/profile";
 
 /** 最終段階。ここに達したら経験値バーは満杯で固定する */
-const MAX_STAGE: CharacterStage = "chick";
+const MAX_STAGE: CharacterStage = "rooster";
 
 const CHARACTER_LABELS: Record<CharacterStage, string> = {
   egg: "たまご",
   hatching: "ふ化中",
   chick: "ひよこ",
+  brown: "ちゃいろひよこ",
+  green: "わかばひよこ",
+  blue: "そらいろひよこ",
+  gold: "こがねひよこ",
+  pink: "ももいろひよこ",
+  rooster: "覚醒ニワトリ",
 };
 
 const CHARACTER_FALLBACK: Record<CharacterStage, string> = {
   egg: "🥚",
   hatching: "🐣",
   chick: "🐤",
+  brown: "🐥",
+  green: "🦜",
+  blue: "🐦",
+  gold: "🦆",
+  pink: "🦩",
+  rooster: "🐔",
 };
 
 type Props = {

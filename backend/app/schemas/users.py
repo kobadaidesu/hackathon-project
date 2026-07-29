@@ -20,7 +20,13 @@ class CharacterStage(str, Enum):
 
     EGG = "egg"            # レベル0: 殻から顔だけ
     HATCHING = "hatching"  # レベル1: 殻が割れて出てくる
-    CHICK = "chick"        # レベル2: 完全体(最終段階)
+    CHICK = "chick"        # レベル2: 生まれたてのひよこ
+    BROWN = "brown"        # レベル3: ちゃいろ
+    GREEN = "green"        # レベル4: わかば
+    BLUE = "blue"          # レベル5: そらいろ
+    GOLD = "gold"          # レベル6: こがね
+    PINK = "pink"          # レベル7: ももいろ
+    ROOSTER = "rooster"    # レベル8: 覚醒ニワトリ(最終段階)
 
 
 class NextEvolution(ApiSchema):
