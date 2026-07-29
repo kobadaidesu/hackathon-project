@@ -7,6 +7,7 @@ import { fetchRecruitments } from "../api/recruitmentApi";
 import { RecruitmentCard } from "../components/recruitment/RecruitmentCard";
 import { Loading } from "../components/common/Loading";
 import { ErrorMessage } from "../components/common/ErrorMessage";
+import { MASCOT } from "../lib/mascot";
 
 export function RecruitmentListPage() {
   const [recruitments, setRecruitments] = useState<Recruitment[]>([]);
@@ -15,7 +16,11 @@ export function RecruitmentListPage() {
 
   useEffect(() => {
     fetchRecruitments()
-      .then((result) => setRecruitments(result.items ?? []))
+      // 募集終了は一覧に出さない。「終了＝一覧から消える」という扱いにするため、
+      // 表示中のカードは必ず募集中になる
+      .then((result) =>
+        setRecruitments((result.items ?? []).filter((r) => r.status === "open"))
+      )
       .catch((e) =>
         setError(e instanceof Error ? e.message : "募集の取得に失敗しました")
       )
@@ -26,7 +31,7 @@ export function RecruitmentListPage() {
     <div className="page recruitment-list-page">
       <div className="timeline-page__header">
         <h1 className="page__title">メンバー募集</h1>
-        <Link to="/recruitments/new" className="button button--primary">
+        <Link to="/recruitments/new" className="button button--action button--sm">
           募集を作成
         </Link>
       </div>
@@ -37,7 +42,13 @@ export function RecruitmentListPage() {
         <ErrorMessage message={error} />
       ) : recruitments.length === 0 ? (
         <div className="empty-state">
-          <p>まだ募集がありません。最初の募集を作成してみましょう。</p>
+          <img src={MASCOT.idle} alt="" className="empty-state__image" />
+          <p className="empty-state__title">まだ募集がありません</p>
+          <p className="empty-state__hint">
+            一緒に作る人を探してみませんか。
+            <br />
+            作りたいものを1行書くだけで十分です。
+          </p>
         </div>
       ) : (
         <div className="recruitment-list">
