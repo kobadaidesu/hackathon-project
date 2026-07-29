@@ -1,0 +1,250 @@
+/* ========================================
+   tokens.css
+   Claude Design「IT学生向けSNSアプリUI」から抽出した
+   デザイントークン。Screens.dc.html / StyleGuide.dc.html が出典。
+
+   この段階では既存の --color-* / --radius-* などには一切触れず、
+   --ds-* 名前空間に並置するだけ。見た目は変わらない。
+   ステップ2以降で既存変数をこちらへ寄せていく。
+   ======================================== */
+
+:root {
+  /* ============================================================
+     01 カラー
+     ひよこ配色。地は目に優しい淡い黄、カードは白、
+     ボタン・アクティブ表現は巣箱のような茶。
+     いいねはマスコットの黄で返す。ピンクはワンポイント。
+     技術タグだけは配色から切り離してある(下の「技術タグ」を参照)。
+     ============================================================ */
+
+  /* --- 下地 --- */
+  --ds-color-base: #FCF5E3;          /* 画面全体の背景。彩度を落とした淡い黄 */
+  --ds-color-surface: #FFFFFF;       /* カード。枠線なし・薄い影のみ */
+  --ds-color-surface-tint: #FAF2E0;  /* カード内のさらに一段沈んだ面 */
+
+  /* --- アクセント(ブラウン) --- */
+  --ds-color-accent: #8A5F3C;        /* CTA・アクティブタブ。白文字でAA(5.6:1) */
+  --ds-color-accent-hover: #7A5334;  /* primaryボタン hover */
+  --ds-color-accent-strong: #6B4728; /* リンク hover */
+  --ds-color-accent-light: #C9A57B;  /* グラデーションの明側 */
+  --ds-color-accent-tint: #F5E8D5;   /* secondaryボタン地 */
+  --ds-color-accent-tint-hover: #EFDEC6;
+
+  /* --- ナイス ---
+     技術タグと同じ淡い青にそろえる(値は下の --ds-color-tag-* を共有)。
+     濃い塗りつぶしにすると投稿画像より強い要素になってしまうので、
+     淡い地＋濃い文字で「押した結果」を主張しすぎない強さに留めるのは変えない。
+     ひよこ画像自体は彩度が戻って黄色くなるので、キャラの主張はそちらが持つ */
+  --ds-color-nice-bg: var(--ds-color-tag-bg);
+  --ds-color-nice-text: var(--ds-color-tag-text);
+
+  /* --- 技術タグ ---
+     公式ロゴを多色で並べる面なので、地は無彩色寄りの淡い青に固定する。
+     アプリの配色を変えてもここは動かさない(意図的にアクセントから切り離してある) */
+  --ds-color-tag-bg: #E6F1FB;
+  --ds-color-tag-text: #36679F;      /* 上の地で5.1:1 */
+  --ds-color-tag-selected-bg: #5B8FD1;
+
+  /* --- テキスト --- */
+  --ds-color-text: #3A2E23;
+  --ds-color-text-secondary: #8A7A66; /* 副文・ラベル */
+  --ds-color-text-muted: #B6A68F;     /* メタ情報・ヒント */
+  --ds-color-text-chip: #6E5D48;      /* 学習段階チップの文字 */
+
+  /* --- 罫・区切り --- */
+  --ds-color-border: #EFE3CC;         /* inset で 1.5px 引く用 */
+  --ds-color-border-faint: #F5EDDC;
+  --ds-color-divider: #F7F0E1;        /* カード内の 1px 区切り */
+
+  /* --- コードブロック --- */
+  --ds-color-code-bg: #F7F0E1;
+  --ds-color-code-text: #4A3B2A;
+  --ds-color-code-comment: #A8977F;
+
+  /* --- カテゴリ(投稿タイプ) --- */
+  --ds-color-category-yellow-bg: #FFF1C9;   /* 今日の学習 */
+  --ds-color-category-yellow-text: #8A6D14;
+  --ds-color-category-pink-bg: #FDEEEC;     /* エラー・困りごと */
+  --ds-color-category-pink-text: #B4665E;
+  --ds-color-category-idle-bg: #F5EDDC;     /* 未選択 */
+  --ds-color-category-idle-text: #8A7A66;
+
+  /* --- マスコット由来のワンポイント --- */
+  --ds-color-mascot-yellow: #FFD84D;  /* 1画面1箇所まで。star パーティクル */
+  --ds-color-mascot-yellow-text: #4A3B12;
+  --ds-color-cheek-pink: #F7B6B0;     /* ナイス済のみ。バッジ・heart パーティクル */
+
+  /* --- アバター下地 --- */
+  --ds-color-avatar-bg-yellow: #FFF1C9;
+  --ds-color-avatar-bg-blue: #F5E8D5; /* 名前は据え置き。中身は茶系のティントへ */
+
+  /* --- disabled --- */
+  --ds-color-disabled-bg: #E9DFCD;
+  --ds-color-disabled-text: #B6A68F;
+  --ds-color-pending-bg: #F0E7D6;     /* 「送信中…」 */
+  --ds-color-pending-text: #BCAB93;
+
+  /* --- 経験値バー --- */
+  --ds-color-progress-track: #EFE3CC;
+  --ds-gradient-progress: linear-gradient(90deg, #C9A57B, #8A5F3C);
+
+  /* --- グラデーション面 --- */
+  --ds-gradient-card: linear-gradient(160deg, #FFFFFF 0%, #FBF4E6 100%);
+  --ds-gradient-card-vertical: linear-gradient(165deg, #FFFFFF 0%, #FAF3E4 100%);
+  --ds-gradient-hero: linear-gradient(180deg, #FEFAF0 0%, #FAF2E0 100%);
+  --ds-gradient-fade-up: linear-gradient(180deg, rgba(252,245,227,0) 0%, #FCF5E3 34%);
+
+  /* ============================================================
+     02 影
+     rgba(138,95,60,*) = アクセントブラウンの影。黒は使わない。
+     ナイス済(--ds-shadow-liked)だけは黄側の影を使う。
+     ============================================================ */
+  --ds-shadow-card: 0 4px 16px rgba(138, 95, 60, 0.08);
+  --ds-shadow-card-raised: 0 4px 18px rgba(138, 95, 60, 0.10);
+  --ds-shadow-panel: 0 6px 24px rgba(138, 95, 60, 0.09);
+  --ds-shadow-avatar: 0 2px 8px rgba(138, 95, 60, 0.12);
+  --ds-shadow-cta: 0 4px 12px rgba(138, 95, 60, 0.28);
+  --ds-shadow-cta-lg: 0 8px 20px rgba(138, 95, 60, 0.30);
+  --ds-shadow-cta-pressed: 0 1px 4px rgba(138, 95, 60, 0.28);
+  --ds-shadow-fab: 0 6px 16px rgba(138, 95, 60, 0.34);
+  /* ナイス済だけはタグと同じ青側の影。茶の影が乗ると色がにごる */
+  --ds-shadow-liked: 0 4px 12px rgba(54, 103, 159, 0.16);
+  --ds-shadow-tabbar: 0 -2px 18px rgba(138, 95, 60, 0.12);
+  --ds-shadow-frame: 0 18px 48px rgba(94, 66, 42, 0.16);
+  --ds-border-inset: inset 0 0 0 1.5px #EFE3CC; /* 枠線の代わり */
+
+  /* ============================================================
+     03 角丸
+     ============================================================ */
+  --ds-radius-pill: 999px;   /* ボタン・タグ・バッジはすべてピル */
+  --ds-radius-sm: 14px;      /* コードブロック・サムネイル・小箱 */
+  --ds-radius-md: 18px;      /* 統計カード・画像スロット */
+  --ds-radius-lg: 20px;      /* ★カード標準 */
+  --ds-radius-xl: 22px;      /* 詳細カード・大きめ画像 */
+  --ds-radius-2xl: 26px;     /* プロフィールカード */
+  --ds-radius-3xl: 28px;     /* ヒーローパネル */
+  --ds-radius-circle: 50%;   /* アバター・FAB */
+
+  /* ============================================================
+     04 余白
+     ============================================================ */
+  --ds-space-3xs: 2px;
+  --ds-space-2xs: 4px;
+  --ds-space-xs: 6px;
+  --ds-space-sm: 8px;
+  --ds-space-md: 12px;
+  --ds-space-lg: 16px;
+  --ds-space-xl: 20px;
+  --ds-space-2xl: 24px;
+  --ds-space-3xl: 32px;
+  --ds-space-4xl: 44px;
+
+  /* よく出る複合値 */
+  --ds-space-screen-x: 20px;      /* 画面の左右パディング */
+  --ds-space-card-y: 18px;        /* カード内 上下 */
+  --ds-space-card-x: 20px;        /* カード内 左右 */
+  --ds-space-card-gap: 14px;      /* カード内要素の縦間隔 */
+  --ds-space-stack: 16px;         /* カード同士の間隔 */
+  --ds-space-tag-gap: 8px;        /* タグ・チップの間隔 */
+
+  /* ============================================================
+     05 タイポグラフィ
+     本文 Zen Maru Gothic / 数字 M PLUS Rounded 1c / コード JetBrains Mono
+     ============================================================ */
+  --ds-font-base: 'Zen Maru Gothic', -apple-system, BlinkMacSystemFont,
+                  'Hiragino Sans', 'Yu Gothic', sans-serif;
+  --ds-font-numeric: 'M PLUS Rounded 1c', 'Zen Maru Gothic', sans-serif;
+  --ds-font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+
+  /* --- サイズ --- */
+  --ds-font-size-2xs: 11px;   /* タブラベル・極小メタ */
+  --ds-font-size-xs: 12px;    /* バッジ・タグ・メタ */
+  --ds-font-size-sm: 13px;    /* キャプション・セクションラベル */
+  --ds-font-size-base: 15px;  /* カード本文・氏名 */
+  --ds-font-size-md: 16px;    /* 長文本文・ボタン・画面見出し(小) */
+  --ds-font-size-lg: 18px;
+  --ds-font-size-xl: 22px;    /* タイトル */
+  --ds-font-size-2xl: 24px;   /* 画面タイトル */
+  --ds-font-size-display: 36px;
+
+  /* --- 数値表示(M PLUS Rounded 1c / 800) --- */
+  --ds-font-size-num-sm: 18px;
+  --ds-font-size-num-md: 26px;
+  --ds-font-size-num-lg: 34px;
+  --ds-font-size-num-xl: 42px;
+  --ds-font-size-num-2xl: 56px;
+
+  /* --- コード --- */
+  --ds-font-size-code-sm: 12px;
+  --ds-font-size-code: 12.5px;
+  --ds-font-size-code-lg: 13px;
+
+  /* --- ウェイト --- */
+  --ds-font-weight-normal: 400;
+  --ds-font-weight-medium: 500;
+  --ds-font-weight-bold: 700;    /* 見出し・ボタン・氏名 */
+  --ds-font-weight-numeric: 800; /* 数値は必ず 800 */
+  --ds-font-weight-display: 900; /* 画面タイトル */
+
+  /* --- 行間 --- */
+  --ds-line-height-display: 1.25;
+  --ds-line-height-tight: 1.2;
+  --ds-line-height-heading: 1.6;
+  --ds-line-height-body: 1.9;    /* 本文の標準 */
+  --ds-line-height-body-sm: 1.85;
+  --ds-line-height-body-lg: 1.95;
+  --ds-line-height-code: 1.8;
+  --ds-line-height-none: 1;      /* 大きい数値 */
+
+  /* ============================================================
+     06 モーション
+     duration / easing。押下は必ず translateY(2px)。
+     ============================================================ */
+  --ds-duration-press: 100ms;      /* 押し込みの transform */
+  --ds-duration-fast: 120ms;       /* hover 系 */
+  --ds-duration-tag: 200ms;        /* タグ選択の背景切替 */
+  --ds-duration-shrink: 200ms;     /* ナイス解除「しゅん」 */
+  --ds-duration-count: 300ms;      /* カウントアップ */
+  --ds-duration-state: 250ms;      /* background / color / shadow の状態遷移 */
+  --ds-duration-burst: 400ms;      /* ひよこジャンプ */
+  --ds-duration-particle: 700ms;   /* ♥★ パーティクル */
+  --ds-duration-particle-clear: 800ms; /* パーティクル撤去までの合計 */
+  --ds-duration-float: 4500ms;     /* マスコットの上下ゆれ(4s〜5s) */
+
+  --ds-ease-out-back: cubic-bezier(.34, 1.56, .64, 1); /* ジャンプ */
+  --ds-ease-count: cubic-bezier(.34, 1.4, .64, 1);     /* カウントアップ */
+  --ds-ease-default: ease;
+  --ds-ease-out: ease-out;
+  --ds-ease-in-out: ease-in-out;   /* floatY のループ */
+
+  --ds-particle-stagger: 30ms;     /* (i % 3) 段ごとの遅延 */
+  --ds-press-offset: 2px;          /* translateY(2px) */
+  --ds-press-scale: .985;
+
+  /* ============================================================
+     07 サイズ
+     ============================================================ */
+  --ds-avatar-sm: 38px;
+  --ds-avatar-md: 40px;
+  --ds-avatar-lg: 44px;
+  --ds-avatar-img-ratio: 0.82;     /* アバター枠に対する画像の実寸比(33/40) */
+
+  --ds-mascot-xs: 76px;
+  --ds-mascot-sm: 92px;
+  --ds-mascot-md: 104px;
+  --ds-mascot-lg: 132px;
+  --ds-mascot-xl: 240px;
+
+  --ds-like-chick-sm: 26px;        /* カード内のナイスボタン */
+  --ds-like-chick-md: 30px;
+  --ds-like-chick-lg: 34px;        /* 詳細画面 */
+
+  --ds-icon-size: 24px;            /* タブ・共通アイコン */
+  --ds-icon-stroke: 2;
+  --ds-fab-size: 54px;             /* 中央の投稿ボタン */
+  --ds-progress-height: 10px;
+  --ds-button-height: 50px;        /* 48–52px */
+  --ds-tap-target-min: 44px;
+
+  --ds-content-max-width: 640px;   /* 既存の --max-width を踏襲 */
+}

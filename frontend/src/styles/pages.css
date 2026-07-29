@@ -9,12 +9,20 @@
 .page {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: var(--spacing-lg) var(--spacing-md);
+  padding: var(--ds-space-xl) var(--ds-space-screen-x) var(--ds-space-3xl);
+}
+
+/* タブバーが出ている画面(=ログイン済み)だけ、その高さぶん下を空ける。
+   ログイン・登録画面には無駄な余白を作らない */
+body:has(.tab-bar) .page {
+  padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
 }
 
 .page__title {
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--spacing-lg);
+  font-size: var(--ds-font-size-2xl);
+  font-weight: var(--ds-font-weight-display);
+  line-height: var(--ds-line-height-tight);
+  margin-bottom: var(--ds-space-xl);
 }
 
 /* ---------- フォーム(投稿作成・募集作成・プロフィール設定で共通) ---------- */
@@ -86,64 +94,139 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-lg);
+  /* 下余白は .page__title 側が持っているので、ここでは足さない */
 }
 
+/* 投稿間の間隔は .post-card 自身の上下パディングが持つ。
+   ここで gap を足すと罫線から本文が離れすぎるので 0 にする */
 .post-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-/* PostCardの中で使われているがcomponents.cssに無かったもの */
-.post-card__body {
-  padding: var(--spacing-md);
-}
-
-.post-card__category {
-  display: inline-block;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  background-color: var(--color-accent-soft);
-  border-radius: var(--radius-tag);
-  padding: 2px var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
 }
 
 .post-card__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-xs);
-  margin-top: var(--spacing-sm);
-}
-
-.post-card__avatar--placeholder {
-  background-color: var(--color-border);
+  /* .tag の margin を外したぶん、間隔はここで持つ */
+  gap: var(--ds-space-tag-gap);
+  /* 長いタグ列がナイスボタンを画面外へ押し出さないように */
+  min-width: 0;
 }
 
 .post-card__error {
   color: var(--color-error);
-  font-size: var(--font-size-sm);
-  margin-top: var(--spacing-xs);
+  font-size: var(--ds-font-size-sm);
 }
 
+/* ---------- ナイス挑戦ボタン(3ステート) ---------- */
 .nice-button {
-  font-family: inherit;
-  font-size: var(--font-size-sm);
-  color: var(--color-primary);
-  background-color: var(--color-bg);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-tag);
-  padding: var(--spacing-xs) var(--spacing-md);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  /* ラベルを外したので右の余白を詰める */
+  padding: 9px 16px 9px 11px;
+  border: none;
+  border-radius: var(--ds-radius-pill);
+  font-family: var(--ds-font-base);
+  font-size: var(--ds-font-size-base);
+  font-weight: var(--ds-font-weight-bold);
+  line-height: 1;
+  cursor: pointer;
+  /* パーティクルがボタンの外へ飛ぶので切り取らない */
+  overflow: visible;
+  /* 白いカードが無く、地(淡い黄)に直接載る。surface-tint だと地と差がなく
+     輪郭が消えるので、.button の未指定バリアントと同じ「白＋細枠」で形を保つ */
+  background: var(--ds-color-surface);
+  color: var(--ds-color-text-secondary);
+  box-shadow: var(--ds-border-inset);
+  transition:
+    background var(--ds-duration-state) var(--ds-ease-default),
+    color var(--ds-duration-state) var(--ds-ease-default),
+    box-shadow var(--ds-duration-state) var(--ds-ease-default),
+    transform var(--ds-duration-press) var(--ds-ease-default);
 }
 
+.nice-button--lg {
+  gap: 10px;
+  padding: 11px 19px 11px 13px;
+  font-size: var(--ds-font-size-md);
+}
+
+/* ナイス済はマスコットの黄で返す。青の塗りつぶしにすると
+   カード内で投稿画像より強い要素になってしまうため、淡い黄地に留める */
 .nice-button--active {
-  color: var(--color-bg);
-  background-color: var(--color-primary);
+  background: var(--ds-color-nice-bg);
+  color: var(--ds-color-nice-text);
+  box-shadow: var(--ds-shadow-liked);
+}
+
+.nice-button:active:not(:disabled) {
+  transform: translateY(var(--ds-press-offset)) scale(var(--ds-press-scale));
 }
 
 .nice-button:disabled {
-  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nice-button__visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--ds-like-chick-md);
+  height: var(--ds-like-chick-md);
+}
+
+.nice-button--lg .nice-button__visual {
+  width: var(--ds-like-chick-lg);
+  height: var(--ds-like-chick-lg);
+}
+
+.nice-button__chick {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  /* 未ナイスは彩度を落として静かに待たせる */
+  filter: saturate(0.45);
+  transition: filter var(--ds-duration-state) var(--ds-ease-default);
+}
+
+.nice-button--active .nice-button__chick {
+  filter: none;
+}
+
+.nice-button__chick--burst {
+  filter: none;
+  animation: ds-chick-jump var(--ds-duration-burst) var(--ds-ease-out-back) both;
+}
+
+.nice-button__chick--shrink {
+  animation: ds-chick-shrink var(--ds-duration-shrink) var(--ds-ease-default) both;
+}
+
+.nice-button__particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -6px;
+  margin-top: -6px;
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0;
+  animation: ds-burst-particle var(--ds-duration-particle) var(--ds-ease-out) forwards;
+}
+
+.nice-button__count {
+  display: inline-block;
+  font-family: var(--ds-font-numeric);
+  font-size: 17px;
+  font-weight: var(--ds-font-weight-numeric);
+  animation: ds-count-up var(--ds-duration-count) var(--ds-ease-count) both;
+}
+
+.nice-button--lg .nice-button__count {
+  font-size: var(--ds-font-size-lg);
 }
 
 /* ---------- 投稿完了(/posts/complete) ---------- */
@@ -201,6 +284,16 @@
 
 .profile-page__links a {
   color: var(--color-primary);
+}
+
+/* ページ末尾の退避操作。投稿一覧と罫線で区切って控えめに置く。
+   下の余白は .page の padding-bottom(TabBar分)が担うので足さない */
+.profile-page__logout {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
 }
 
 /* ---------- 募集(/recruitments) ---------- */
@@ -344,23 +437,8 @@
   outline-offset: -1px;
 }
 
-/* ---------- ヘッダーの未読バッジ ---------- */
-.header__messages {
-  position: relative;
-}
-
-.header__badge {
-  display: inline-block;
-  min-width: 18px;
-  margin-left: 4px;
-  padding: 0 5px;
-  font-size: 11px;
-  line-height: 18px;
-  text-align: center;
-  color: var(--color-bg);
-  background-color: var(--color-error);
-  border-radius: var(--radius-tag);
-}
+/* 未読バッジはヘッダーからタブバーへ移したので、
+   .header__messages / .header__badge はここから削除した(.tab-bar__badge を参照) */
 
 /* ---------- 404 ---------- */
 .not-found-page {

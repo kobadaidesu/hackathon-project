@@ -1,0 +1,52 @@
+/* ========================================
+   animations.css
+   デザインから抽出した @keyframes 群。
+   duration / easing は tokens.css の --ds-duration-* / --ds-ease-* を使う。
+   ここでは keyframes の定義だけを持つ。
+   ======================================== */
+
+/* ナイス挑戦:押した瞬間にひよこが跳ねる */
+@keyframes ds-chick-jump {
+  0%   { transform: scale(1) translateY(0); }
+  35%  { transform: scale(1.3) translateY(-8px); }
+  70%  { transform: scale(1.06) translateY(0); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* ナイス挑戦を解除:しゅんと縮む */
+@keyframes ds-chick-shrink {
+  0%   { transform: scale(1); }
+  55%  { transform: scale(0.82); }
+  100% { transform: scale(1); }
+}
+
+/* 飛び散る ♥ と ★。--tx / --ty / --rot は JS 側から個別に渡す */
+@keyframes ds-burst-particle {
+  0%   { transform: translate(0, 0) scale(0.3) rotate(0deg); opacity: 0; }
+  22%  { opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot)); opacity: 0; }
+}
+
+/* 数値の入れ替わり */
+@keyframes ds-count-up {
+  0%   { transform: translateY(9px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* マスコットの上下ゆれ */
+@keyframes ds-float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+/* 動きを減らす設定を尊重する。デザインの意図は「跳ねる」なので、
+   完全に消さず一瞬で終わらせる形にしている */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -6,6 +6,7 @@ import { fetchPosts } from "../../api/postApi";
 import { PostCard } from "./PostCard";
 import { Loading } from "../common/Loading";
 import { ErrorMessage } from "../common/ErrorMessage";
+import { MASCOT } from "../../lib/mascot";
 
 export function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -47,7 +48,13 @@ export function PostList() {
   if (posts.length === 0) {
     return (
       <div className="empty-state">
-        <p>まだ投稿がありません。最初の投稿を作成してみましょう。</p>
+        <img src={MASCOT.idle} alt="" className="empty-state__image" />
+        <p className="empty-state__title">まだ投稿がありません</p>
+        <p className="empty-state__hint">
+          今日やったことを1行だけ書いてみる、
+          <br />
+          それで十分です。
+        </p>
       </div>
     );
   }
