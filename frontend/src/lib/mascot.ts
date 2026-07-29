@@ -12,3 +12,23 @@ export const MASCOT = {
 } as const;
 
 export type MascotVariant = keyof typeof MASCOT;
+
+/**
+ * 下部タブバーのアイコン。
+ * public/images/_original/ の原本から透明部分を切り落として128pxへ縮めたもの。
+ * 原本は退避用で .gitignore 済み(トリミング後のこちらだけコミットする)。
+ */
+/**
+ * 画面の主役として置く一枚絵。
+ * こちらも _original/ の原本から切り出して縮小・減色したもの。
+ */
+export const ILLUSTRATION = {
+  login: "/images/login-hero.png",
+} as const;
+
+export const TAB_ICON = {
+  home: "/images/tab-home.png",
+  recruit: "/images/tab-recruit.png",
+  message: "/images/tab-message.png",
+  profile: "/images/tab-profile.png",
+} as const;

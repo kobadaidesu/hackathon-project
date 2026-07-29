@@ -7,45 +7,12 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { fetchUnreadCount } from "../../api/messageApi";
 import { useAuth } from "../../contexts/AuthContext";
+import { TAB_ICON } from "../../lib/mascot";
 
-// アイコンはデザイン内の SVG をそのまま持ってきている(24px / stroke 2)
-const strokeProps = {
-  width: 24,
-  height: 24,
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 2,
-  strokeLinecap: "round" as const,
-  strokeLinejoin: "round" as const,
-};
-
-const HomeIcon = () => (
-  <svg {...strokeProps} aria-hidden="true">
-    <path d="M4 11 12 4l8 7" />
-    <path d="M6 10v9h12v-9" />
-  </svg>
-);
-
-const RecruitIcon = () => (
-  <svg {...strokeProps} aria-hidden="true">
-    <circle cx="9" cy="8" r="3" />
-    <path d="M3.5 19c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5" />
-    <path d="M17 8h4M19 6v4" />
-  </svg>
-);
-
-const MessageIcon = () => (
-  <svg {...strokeProps} aria-hidden="true">
-    <path d="M4 6h16v11H9l-4 3V6z" />
-  </svg>
-);
-
-const ProfileIcon = () => (
-  <svg {...strokeProps} aria-hidden="true">
-    <circle cx="12" cy="8.5" r="3.5" />
-    <path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6" />
-  </svg>
+// タブのアイコンはマスコットの描き下ろしPNG。
+// 中央の投稿ボタンだけは塗りつぶしの円に載るので、線画のSVGのまま。
+const TabIcon = ({ src }: { src: string }) => (
+  <img src={src} alt="" className="tab-bar__icon" />
 );
 
 const PlusIcon = () => (
@@ -88,12 +55,12 @@ export function TabBar() {
   return (
     <nav className="tab-bar" aria-label="メインナビゲーション">
       <NavLink to="/" className={tabClass} end>
-        <HomeIcon />
+        <TabIcon src={TAB_ICON.home} />
         <span className="tab-bar__label">ホーム</span>
       </NavLink>
 
       <NavLink to="/recruitments" className={tabClass}>
-        <RecruitIcon />
+        <TabIcon src={TAB_ICON.recruit} />
         <span className="tab-bar__label">募集</span>
       </NavLink>
 
@@ -106,7 +73,7 @@ export function TabBar() {
 
       <NavLink to="/messages" className={tabClass}>
         <span className="tab-bar__icon-wrap">
-          <MessageIcon />
+          <TabIcon src={TAB_ICON.message} />
           {unreadCount > 0 && (
             <span className="tab-bar__badge">{unreadCount}</span>
           )}
@@ -115,7 +82,7 @@ export function TabBar() {
       </NavLink>
 
       <NavLink to="/profile" className={tabClass}>
-        <ProfileIcon />
+        <TabIcon src={TAB_ICON.profile} />
         <span className="tab-bar__label">マイページ</span>
       </NavLink>
     </nav>
