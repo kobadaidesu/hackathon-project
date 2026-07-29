@@ -6,7 +6,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { ErrorMessage } from "../components/common/ErrorMessage";
-import { MASCOT } from "../lib/mascot";
+import { ILLUSTRATION } from "../lib/mascot";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -39,12 +39,18 @@ export function LoginPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
-        <img src={MASCOT.idle} alt="" className="auth-card__mascot" />
+      <div className="auth-body">
+        <img
+          src={ILLUSTRATION.login}
+          alt=""
+          className="auth-hero"
+          width={720}
+          height={450}
+        />
 
-        <div className="auth-card__heading">
-          <h1 className="auth-card__title">おかえりなさい</h1>
-          <p className="auth-card__lead">今日の学びを残していきましょう</p>
+        <div className="auth-heading">
+          <h1 className="auth-heading__title">おかえりなさい</h1>
+          <p className="auth-heading__lead">今日の学びを残していきましょう</p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
@@ -83,7 +89,7 @@ export function LoginPage() {
           </button>
         </form>
 
-        <p className="auth-card__switch">
+        <p className="auth-switch">
           アカウントをお持ちでない方は <Link to="/signup">こちらから登録</Link>
         </p>
       </div>
