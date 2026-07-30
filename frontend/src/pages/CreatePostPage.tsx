@@ -4,6 +4,7 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPost } from "../api/postApi";
 import { fetchTechTags } from "../api/techTagApi";
+import { useAuth } from "../contexts/AuthContext";
 import type { PostCategory } from "../types/post";
 import { POST_CATEGORY_LABELS } from "../types/post";
 import type { TechTag } from "../types/api";
@@ -20,6 +21,7 @@ const CATEGORY_OPTIONS = Object.entries(POST_CATEGORY_LABELS) as [
 
 export function CreatePostPage() {
   const navigate = useNavigate();
+  const { refreshCurrentUser } = useAuth();
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -93,7 +95,11 @@ export function CreatePostPage() {
 
       const result = await createPost(formData);
 
-      // 完了画面へレスポンス(post + expResult)をそのまま渡す。再取得は不要
+      // 投稿で加算された経験値をcurrentUserにも反映し、
+      // 以降のマイページでログイン時の古い値を表示しないようにする。
+      await refreshCurrentUser();
+
+      // 完了画面は投稿APIのexpResultをそのまま使う。
       navigate("/posts/complete", { state: result });
     } catch (e) {
       setError(e instanceof Error ? e.message : "投稿に失敗しました");
