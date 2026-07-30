@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useCallback, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { signup, login, logout, getToken } from '../lib/auth';
 import { apiRequest } from '../api/apiClient';
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const refreshCurrentUser = async () => {
+  const refreshCurrentUser = useCallback(async () => {
     const token = await getToken();
     if (!token) {
       setCurrentUser(null);
@@ -35,12 +35,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch {
       setCurrentUser(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     // アプリ起動時に、今ログインしているかどうかを確認する
     refreshCurrentUser().finally(() => setIsLoading(false));
-  }, []);
+  }, [refreshCurrentUser]);
 
   const handleLogin = async (email: string, password: string) => {
     await login(email, password);

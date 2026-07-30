@@ -52,7 +52,9 @@ export function CharacterDisplay({
   evolved = false,
   size = "lg",
 }: Props) {
-  const [imageFailed, setImageFailed] = useState(false);
+  const imageSrc = `/images/character-${characterStage}.png`;
+  const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
+  const imageFailed = failedImageSrc === imageSrc;
 
   const imageClassName = `character-display__image${
     size === "sm" ? " character-display__image--sm" : ""
@@ -75,9 +77,9 @@ export function CharacterDisplay({
       ) : (
         <img
           className={imageClassName}
-          src={`/images/character-${characterStage}.png`}
+          src={imageSrc}
           alt={CHARACTER_LABELS[characterStage]}
-          onError={() => setImageFailed(true)}
+          onError={() => setFailedImageSrc(imageSrc)}
         />
       )}
 
