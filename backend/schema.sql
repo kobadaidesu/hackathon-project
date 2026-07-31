@@ -43,7 +43,7 @@ insert into tech_tags (name) values
   ('Rust'), ('Java'), ('Kotlin'), ('Swift'), ('Flutter'),
   ('PHP'), ('Ruby'), ('C++'), ('SQL'), ('Supabase'),
   ('AWS'), ('Docker'), ('Git'), ('Linux'), ('Unity'),
-  ('機械学習'), ('AtCoder');
+  ('機械学習'), ('AtCoder'), ('Assembly');
 
 create table posts (
   id uuid primary key default gen_random_uuid(),
