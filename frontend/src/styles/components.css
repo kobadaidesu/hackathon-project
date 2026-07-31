@@ -603,6 +603,29 @@
   height: var(--character-size-sm);
 }
 
+/* 「Lv.3  ちゃいろひよこ」の1行。バッジは経験値バーと同じ青系でそろえる */
+.character-display__level {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-sm);
+  margin-top: var(--ds-space-md);
+}
+
+.character-display__level-badge {
+  padding: 2px 10px;
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-gradient-progress);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: var(--ds-font-weight-numeric);
+}
+
+.character-display__level-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--ds-font-weight-bold);
+  color: var(--color-text);
+}
+
 .character-display__exp-bar {
   width: 100%;
   max-width: 240px;
