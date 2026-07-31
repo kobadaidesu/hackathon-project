@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import type { CharacterStage } from "../../types/profile";
+import { characterLevel } from "../../types/profile";
 
 /** 最終段階。ここに達したら経験値バーは満杯で固定する */
 const MAX_STAGE: CharacterStage = "rooster";
@@ -63,13 +64,14 @@ export function CharacterDisplay({
   const isMaxStage = characterStage === MAX_STAGE;
   const progressPercent = isMaxStage ? 100 : nextEvolution?.progressPercent ?? 0;
 
+  // 段階名はレベル表示の中に文字として出るので、画像側は装飾扱いにして
+  // スクリーンリーダーが同じ名前を二度読まないようにする
   return (
     <div className="character-display">
       {imageFailed ? (
         <div
           className={imageClassName}
-          role="img"
-          aria-label={CHARACTER_LABELS[characterStage]}
+          aria-hidden="true"
           style={{ fontSize: size === "sm" ? 32 : 96, lineHeight: 1.2 }}
         >
           {CHARACTER_FALLBACK[characterStage]}
@@ -78,10 +80,19 @@ export function CharacterDisplay({
         <img
           className={imageClassName}
           src={imageSrc}
-          alt={CHARACTER_LABELS[characterStage]}
+          alt=""
           onError={() => setFailedImageSrc(imageSrc)}
         />
       )}
+
+      <p className="character-display__level">
+        <span className="character-display__level-badge">
+          Lv.{characterLevel(characterStage)}
+        </span>
+        <span className="character-display__level-name">
+          {CHARACTER_LABELS[characterStage]}
+        </span>
+      </p>
 
       {nextEvolution !== undefined && (
         <>

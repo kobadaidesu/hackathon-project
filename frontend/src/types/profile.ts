@@ -3,9 +3,21 @@ export type LearningStage =
   | "personal_development" | "want_team_development" | "professional";
 
 /** 経験値100ごとに1段階。順序はこの並びどおりで、rooster が最終段階 */
-export type CharacterStage =
-  | "egg" | "hatching" | "chick"
-  | "brown" | "green" | "blue" | "gold" | "pink" | "rooster";
+export const CHARACTER_STAGES = [
+  "egg", "hatching", "chick",
+  "brown", "green", "blue", "gold", "pink", "rooster",
+] as const;
+
+export type CharacterStage = (typeof CHARACTER_STAGES)[number];
+
+/**
+ * レベルは段階の添字そのもの(egg=0 … rooster=8)。
+ * バックエンドの 経験値 // EVOLUTION_THRESHOLD と同じ値になるので、
+ * 閾値(100)をフロントに持たずに済み、画像とレベルがずれることもない。
+ */
+export function characterLevel(stage: CharacterStage): number {
+  return CHARACTER_STAGES.indexOf(stage);
+}
 
 export type UserSummary = {
   id: string;

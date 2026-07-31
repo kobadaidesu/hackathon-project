@@ -32,6 +32,27 @@ import {
   siUnity,
 } from "simple-icons";
 
+/**
+ * アセンブリ言語は特定企業の製品ではないため公式ロゴが存在しない。
+ * simple-icons にある AssemblyScript と WebAssembly はどちらも別技術なので、
+ * 流用せずCPUチップを模した自作アイコンを置く。
+ *
+ * 形式は simple-icons と揃えてある(24x24のviewBox / hexは#無し)ので ICONS に直接入る。
+ * 中央の窓は、本体を時計回り・窓を反時計回りに描いて nonzero則 で抜いている。
+ * タグ内では14px表示(components.css の .tag__logo)なので、
+ * ピンの幅と隙間はどちらも2ユニット取って潰れないようにしてある。
+ */
+const ASSEMBLY_CHIP = {
+  path:
+    "M5 5h14v14H5zM9 9v6h6V9z" + // 本体(外枠は時計回り、窓は反時計回り)
+    "M7 2h2v3H7zM11 2h2v3h-2zM15 2h2v3h-2z" + // 上のピン
+    "M7 19h2v3H7zM11 19h2v3h-2zM15 19h2v3h-2z" + // 下のピン
+    "M2 7h3v2H2zM2 11h3v2H2zM2 15h3v2H2z" + // 左のピン
+    "M19 7h3v2h-3zM19 11h3v2h-3zM19 15h3v2h-3z", // 右のピン
+  // 公式カラーが無いのでテーマのブラウン(global.css の --color-primary)を使う
+  hex: "8A5F3C",
+};
+
 export type TechIcon = {
   /** 24x24 の viewBox 前提の path */
   path: string;
@@ -65,6 +86,8 @@ const ICONS: Record<string, { path: string; hex: string }> = {
   Git: siGit,
   Linux: siLinux,
   Unity: siUnity,
+  // simple-icons 由来ではない唯一の項目(理由は ASSEMBLY_CHIP のコメント)
+  Assembly: ASSEMBLY_CHIP,
 };
 
 // ブランドカラーが白や極端に薄い色で、淡いタグ地に載せると消えるものだけ差し替える
