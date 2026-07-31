@@ -1,6 +1,10 @@
 import { getToken } from "../lib/auth";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// 空(未設定)なら "/api/..." という相対パスで投げる。開発中は
+// vite.config.ts のproxyが同じPCの8000番へ中継するので、スマホ実機から
+// 開いてもPCのIPを埋め込む必要がない。
+// デプロイ時など、別ホストのAPIを叩きたいときだけ .env で指定する。
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 /**
  * エラーレスポンスから表示用のメッセージを取り出す。
