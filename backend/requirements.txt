@@ -1,8 +1,12 @@
-fastapi
-uvicorn
-sqlalchemy
-psycopg2-binary
-pydantic-settings
-pyjwt[crypto]
-httpx
-python-multipart
+# バージョンは手元の venv で動作確認済みの値に固定してある。
+# 固定しないとRenderのビルド時に最新版が入り、破壊的変更を踏むと
+# ローカルでは再現しない失敗になるため。
+# 上げるときは手元で pip install -U してから動作確認し、この値を書き換える。
+fastapi==0.140.13
+uvicorn==0.51.0
+sqlalchemy==2.0.51
+psycopg2-binary==2.9.12
+pydantic-settings==2.14.2
+pyjwt[crypto]==2.13.0
+httpx==0.28.1
+python-multipart==0.0.32

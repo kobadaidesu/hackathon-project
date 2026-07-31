@@ -1,0 +1,33 @@
+# Render の Blueprint 設定(バックエンドのみ。フロントは Vercel)。
+#
+# Render はリポジトリ直下の render.yaml しか読まないため、backend/ の中ではなく
+# ここに置いて rootDir で位置を指定している。
+#
+# 管理画面で New → Blueprint からリポジトリを選ぶと、この内容が読み込まれる。
+# 入力が必要なのは sync: false を付けた2つの秘密情報だけ。
+services:
+  - type: web
+    name: hackathon-api
+    runtime: python
+    plan: free
+    # 日本からの距離が近い順。リージョンが選べないプランで弾かれたら、
+    # この1行を消せば既定(oregon)になる
+    region: singapore
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # $PORT は Render が割り当てる。0.0.0.0 で待ち受けないと外部から届かない
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    # 認証不要で軽いエンドポイントを使う(app/main.py の health)
+    healthCheckPath: /api/health
+    envVars:
+      # ローカルの動作確認と同じ系列に固定する
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # 秘密ではないので実値のまま(frontend/.env.example と同じ値)
+      - key: SUPABASE_URL
+        value: https://jlrhmfjztmqmlvykwqaw.supabase.co
+      # sync: false = リポジトリには置かず、管理画面で入力する
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
