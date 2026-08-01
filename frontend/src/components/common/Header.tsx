@@ -4,10 +4,17 @@
 // 画面間の移動は TabBar 側が持つ。未読バッジも TabBar へ移した。
 // ログアウトは滅多に使わないので、常時見えるここではなくプロフィール画面へ置いた。
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { LOGO } from "../../lib/mascot";
+import { isMessageThreadRoute } from "../../lib/routes";
 
 export function Header() {
+  const { pathname } = useLocation();
+
+  // DMのスレッドは縦を目一杯使いたいので、この帯は出さない。
+  // 一覧へ戻る導線はスレッド側のヘッダーが持っている
+  if (isMessageThreadRoute(pathname)) return null;
+
   return (
     <header className="header">
       {/* ロゴ画像がアプリ名そのものなので、alt にアプリ名を入れる */}

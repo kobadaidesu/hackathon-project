@@ -8,6 +8,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { fetchUnreadCount } from "../../api/messageApi";
 import { useAuth } from "../../contexts/AuthContext";
 import { TAB_ICON } from "../../lib/mascot";
+import { isMessageThreadRoute } from "../../lib/routes";
 
 // タブのアイコンはマスコットの描き下ろしPNG。
 // 中央の投稿ボタンだけは塗りつぶしの円に載るので、線画のSVGのまま。
@@ -51,6 +52,9 @@ export function TabBar() {
 
   // 未ログイン(ログイン・登録画面)では出さない
   if (!currentUser) return null;
+
+  // DMのスレッドでは、入力欄と重ならないよう縦を明け渡す(Header も同様に消える)
+  if (isMessageThreadRoute(location.pathname)) return null;
 
   return (
     <nav className="tab-bar" aria-label="メインナビゲーション">
