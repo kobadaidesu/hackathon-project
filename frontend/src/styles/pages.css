@@ -642,6 +642,12 @@ body:has(.tab-bar) .page {
   overflow: hidden;
 }
 
+/* 名前と学習段階を包む div もフレックスアイテム。min-width: auto のままだと
+   下の省略記号が効かず、長い表示名でヘッダーごと横へはみ出す */
+.message-thread__partner > div {
+  min-width: 0;
+}
+
 /* 表示名は30文字まで許しているので、細い画面では省略記号に逃がす */
 .message-thread__partner .conversation-card__name {
   display: block;
@@ -683,6 +689,9 @@ body:has(.tab-bar) .page {
   border-radius: var(--radius-card);
   white-space: pre-wrap;
   word-break: break-word;
+  /* 切れ目の無い長いURLなどを確実に折る。これが無いと1件の投稿で
+     ページ全体が横スクロールできる状態になる */
+  overflow-wrap: anywhere;
 }
 
 .message-bubble--mine {
@@ -715,6 +724,14 @@ body:has(.tab-bar) .page {
 
 .message-form input {
   flex: 1;
+  /* これが無いと iPhone で送信ボタンが画面の右外へ押し出される。
+     フレックスアイテムの min-width は既定が auto で、input の場合これは
+     size 属性(既定20文字)から決まる固有幅に解決される。つまり
+     「20文字ぶん＋パディング」が縮まない下限になり、行が入りきらないとき
+     入力欄が縮む代わりに隣のボタンが外へ出る。
+     Chromeのデバイスエミュレーションは固有幅をChromeのフォントメトリクスで
+     計算するため再現せず、実機のSafariでだけ起きる */
+  min-width: 0;
   padding: var(--spacing-sm) var(--spacing-md);
   font-family: inherit;
   /* 16px未満にするとiOSがフォーカス時に画面ごと拡大する(global.css参照) */
@@ -723,6 +740,18 @@ body:has(.tab-bar) .page {
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-button);
+}
+
+/* 送信ボタンは汎用の .button(padding: 14px 28px)だと2文字のラベルに対して
+   左右が広すぎ、狭い画面で入力欄を圧迫する。横だけ詰める。
+   高さは .button の min-height(44px = 最小タップ領域)が持つので触らない */
+.message-form .button {
+  flex: none;
+  padding-left: 18px;
+  padding-right: 18px;
+  /* 送信中はラベルが「送信中...」に伸びる。折り返させない
+     (伸びたぶんは上の min-width: 0 で入力欄が吸収する) */
+  white-space: nowrap;
 }
 
 .message-form input:focus {
