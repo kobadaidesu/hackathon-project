@@ -10,6 +10,7 @@ import type { UserSummary } from "../types/profile";
 import { fetchMessagesWith, sendMessage } from "../api/messageApi";
 import { useAuth } from "../contexts/AuthContext";
 import { LEARNING_STAGE_LABELS } from "../types/profile";
+import { Avatar } from "../components/common/Avatar";
 import { Loading } from "../components/common/Loading";
 import { ErrorMessage } from "../components/common/ErrorMessage";
 
@@ -88,15 +89,10 @@ export function MessageThreadPage() {
     <div className="page message-thread-page">
       {partner && (
         <Link to={`/users/${partner.id}`} className="message-thread__header">
-          {partner.avatarUrl ? (
-            <img
-              src={partner.avatarUrl}
-              alt=""
-              className="conversation-card__avatar"
-            />
-          ) : (
-            <div className="conversation-card__avatar" />
-          )}
+          <Avatar
+            src={partner.avatarUrl}
+            className="conversation-card__avatar"
+          />
           <div>
             <p className="conversation-card__name">{partner.displayName}</p>
             {partner.learningStage && (

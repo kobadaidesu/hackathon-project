@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import type { Conversation } from "../types/message";
 import { fetchConversations } from "../api/messageApi";
 import { LEARNING_STAGE_LABELS } from "../types/profile";
+import { Avatar } from "../components/common/Avatar";
 import { Loading } from "../components/common/Loading";
 import { ErrorMessage } from "../components/common/ErrorMessage";
 
@@ -45,15 +46,10 @@ export function MessageListPage() {
               to={`/messages/${conversation.partner.id}`}
               className="conversation-card card-base"
             >
-              {conversation.partner.avatarUrl ? (
-                <img
-                  src={conversation.partner.avatarUrl}
-                  alt=""
-                  className="conversation-card__avatar"
-                />
-              ) : (
-                <div className="conversation-card__avatar" />
-              )}
+              <Avatar
+                src={conversation.partner.avatarUrl}
+                className="conversation-card__avatar"
+              />
 
               <div className="conversation-card__body">
                 <p className="conversation-card__name">

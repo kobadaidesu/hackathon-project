@@ -8,7 +8,7 @@ import { Tag } from "../common/Tag";
 import { NiceButton } from "./NiceButton";
 import { LEARNING_STAGE_LABELS } from "../../types/profile";
 import { useAuth } from "../../contexts/AuthContext";
-import { MASCOT } from "../../lib/mascot";
+import { Avatar } from "../common/Avatar";
 import { formatRelativeTime } from "../../lib/formatRelativeTime";
 
 type Props = {
@@ -118,12 +118,12 @@ export function PostCard({ post, onUpdate, onDelete }: Props) {
       <div className="post-card__header">
         <div className="post-card__header-main">
           <span className="post-card__avatar">
-            {post.author.avatarUrl ? (
-              <img src={post.author.avatarUrl} alt="" className="post-card__avatar-img" />
-            ) : (
-              // 未設定のときはマスコットで埋める(デザインの既定アバター)
-              <img src={MASCOT.idle} alt="" className="post-card__avatar-img post-card__avatar-img--mascot" />
-            )}
+            {/* 未設定・読み込み失敗はAvatarがマスコットで埋める */}
+            <Avatar
+              src={post.author.avatarUrl}
+              className="post-card__avatar-img"
+              mascotClassName="post-card__avatar-img--mascot"
+            />
           </span>
 
           <span className="post-card__identity">

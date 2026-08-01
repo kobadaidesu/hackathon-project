@@ -9,6 +9,7 @@ import { LEARNING_STAGE_LABELS } from "../../types/profile";
 import { fetchUserPosts } from "../../api/profileApi";
 import { CharacterDisplay } from "./CharacterDisplay";
 import { PostCard } from "../post/PostCard";
+import { Avatar } from "../common/Avatar";
 import { Tag } from "../common/Tag";
 import { Loading } from "../common/Loading";
 import { ErrorMessage } from "../common/ErrorMessage";
@@ -50,11 +51,7 @@ export function ProfileView({ profile }: Props) {
   return (
     <>
       <div className="profile-page__header">
-        {profile.avatarUrl ? (
-          <img src={profile.avatarUrl} alt="" className="profile-page__avatar" />
-        ) : (
-          <div className="profile-page__avatar" />
-        )}
+        <Avatar src={profile.avatarUrl} className="profile-page__avatar" />
         <div>
           <p className="profile-page__name">
             {profile.displayName ?? "(表示名未設定)"}
