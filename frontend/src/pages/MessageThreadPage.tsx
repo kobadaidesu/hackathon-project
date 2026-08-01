@@ -59,10 +59,16 @@ export function MessageThreadPage() {
     return () => clearInterval(timer);
   }, [load]);
 
+  // 動くのは .message-thread の中だけ(スクロール領域がそこに閉じているため)。
+  // ページ全体が飛ぶことはない
+  const scrollToBottom = useCallback(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, []);
+
   // 新着が入ったら一番下へ
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+    scrollToBottom();
+  }, [messages.length, scrollToBottom]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -82,52 +88,94 @@ export function MessageThreadPage() {
     }
   };
 
-  if (isLoading) return <Loading />;
-  if (error && messages.length === 0) return <ErrorMessage message={error} />;
+  // 履歴が1件も無い状態でのエラー = そもそも開けなかった、として扱う
+  const failedToLoad = Boolean(error) && messages.length === 0;
 
+  // この画面は Header も TabBar も出していないので、読み込み中やエラーでも
+  // 枠ごと差し替えない。早期returnすると戻る導線まで消えて、ブラウザの
+  // 戻る以外に一覧へ帰れなくなるため
   return (
-    <div className="page message-thread-page">
-      {partner && (
-        <Link to={`/users/${partner.id}`} className="message-thread__header">
-          <Avatar
-            src={partner.avatarUrl}
-            className="conversation-card__avatar"
-          />
-          <div>
-            <p className="conversation-card__name">{partner.displayName}</p>
-            {partner.learningStage && (
-              <p className="conversation-card__stage">
-                {LEARNING_STAGE_LABELS[partner.learningStage]}
-              </p>
-            )}
-          </div>
+    <div className="message-thread-page">
+      {/* この画面ではHeaderもTabBarも出ないので、一覧へ戻る導線をここが持つ */}
+      <header className="message-thread__bar">
+        <Link
+          to="/messages"
+          className="message-thread__back"
+          aria-label="メッセージ一覧へ戻る"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
         </Link>
-      )}
+
+        {partner && (
+          <Link
+            to={`/users/${partner.id}`}
+            className="message-thread__partner"
+          >
+            <Avatar
+              src={partner.avatarUrl}
+              className="conversation-card__avatar"
+            />
+            <div>
+              <p className="conversation-card__name">{partner.displayName}</p>
+              {partner.learningStage && (
+                <p className="conversation-card__stage">
+                  {LEARNING_STAGE_LABELS[partner.learningStage]}
+                </p>
+              )}
+            </div>
+          </Link>
+        )}
+      </header>
 
       <div className="message-thread">
-        {messages.length === 0 ? (
-          <div className="empty-state">
-            <p>まだメッセージがありません。最初の一言を送ってみましょう。</p>
-          </div>
+        {isLoading ? (
+          <Loading />
+        ) : failedToLoad ? (
+          <ErrorMessage message={error} />
         ) : (
-          messages.map((message) => {
-            const isMine = message.senderId === currentUser?.id;
-            return (
-              <div
-                key={message.id}
-                className={`message-bubble ${
-                  isMine ? "message-bubble--mine" : "message-bubble--theirs"
-                }`}
-              >
-                {message.body}
+          /* 会話が短いときにバブルを下端へ寄せるための包み。
+             スクロール側に justify-content: flex-end を使うと、あふれた分が
+             上へ抜けてスクロールで戻せなくなるので、こちらで寄せる */
+          <div className="message-thread__items">
+            {messages.length === 0 ? (
+              <div className="empty-state">
+                <p>まだメッセージがありません。最初の一言を送ってみましょう。</p>
               </div>
-            );
-          })
+            ) : (
+              messages.map((message) => {
+                const isMine = message.senderId === currentUser?.id;
+                return (
+                  <div
+                    key={message.id}
+                    className={`message-bubble ${
+                      isMine ? "message-bubble--mine" : "message-bubble--theirs"
+                    }`}
+                  >
+                    {message.body}
+                  </div>
+                );
+              })
+            )}
+            <div ref={bottomRef} />
+          </div>
         )}
-        <div ref={bottomRef} />
       </div>
 
-      {error && <ErrorMessage message={error} />}
+      {/* 送信の失敗は履歴を読める状態のまま入力欄の上に出す。
+          開けなかった場合は上の一覧側に出しているので、ここでは繰り返さない */}
+      {!failedToLoad && error && <ErrorMessage message={error} />}
 
       <form className="message-form" onSubmit={handleSubmit}>
         <input
@@ -136,6 +184,9 @@ export function MessageThreadPage() {
           maxLength={BODY_MAX_LENGTH}
           placeholder="メッセージを入力"
           onChange={(e) => setBody(e.target.value)}
+          // キーボードが出ると可視領域が縮むので、最新のメッセージを
+          // 入力欄の上へ送り直す
+          onFocus={scrollToBottom}
         />
         <button
           type="submit"

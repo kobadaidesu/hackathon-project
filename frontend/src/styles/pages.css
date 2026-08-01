@@ -379,14 +379,14 @@ body:has(.tab-bar) .page {
 }
 
 /* ---------- ログイン・新規登録(/login, /signup) ---------- */
-/* 未ログイン時は TabBar が出ないので、上のヘッダー(約50px)を除いた
+/* 未ログイン時は TabBar が出ないので、上のヘッダーを除いた
    残り全部を使って上下中央に置く。dvh はモバイルのアドレスバー伸縮に追従する */
 .auth-page {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 56px);
-  min-height: calc(100dvh - 56px);
+  min-height: calc(100vh - var(--header-height));
+  min-height: calc(100dvh - var(--header-height));
   padding: var(--ds-space-2xl) var(--ds-space-screen-x) var(--ds-space-3xl);
 }
 
@@ -589,23 +589,91 @@ body:has(.tab-bar) .page {
 }
 
 /* ---------- スレッド(/messages/:userId) ---------- */
-.message-thread__header {
+/* この画面だけ Header と TabBar を出さない(lib/routes.ts で判定)。
+   画面の高さを丸ごと使い、上下を固定して真ん中だけスクロールさせる。
+   .page は使わない(あちらは下へ伸びるページ用で、下端固定と両立しない)。
+
+   高さに vh を使うと、iOSではアドレスバーを含まない最大の画面高さで
+   計算されるため、実際に見えている領域からはみ出す。dvh は伸縮に追従する。
+   dvh が読めない環境のために vh を先に置いて上書きさせる */
+.message-thread-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--ds-space-screen-x);
+}
+
+.message-thread__bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) 0 var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* 戻る矢印。指で押せる44pxを確保し、はみ出したぶんは左へ引いて
+   画面端の余白と視覚的に揃える */
+.message-thread__back {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: -10px;
+  color: var(--color-text);
+  border-radius: 50%;
+}
+
+.message-thread__back:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.message-thread__partner {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: var(--spacing-md);
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 表示名は30文字まで許しているので、細い画面では省略記号に逃がす */
+.message-thread__partner .conversation-card__name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .message-thread {
+  flex: 1;
+  /* これが無いとフレックスアイテムが中身の高さまで伸びてしまい、
+     overflow が効かずページごと下へ伸びる。この画面の肝 */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  /* 端まで引いたときに背後が動かないようにする */
+  overscroll-behavior: contain;
+  padding: var(--spacing-md) 0;
+}
+
+/* 会話が短いときにバブルを下端へ寄せる。スクロール側に
+   justify-content: flex-end を使うと、あふれた分が上へ抜けて
+   スクロールで戻せなくなるので、auto マージンで寄せる */
+.message-thread__items {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  min-height: 40vh;
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: var(--spacing-sm) 0;
+  margin-top: auto;
+}
+
+.message-thread-page .error-message {
+  flex: none;
 }
 
 .message-bubble {
@@ -627,10 +695,21 @@ body:has(.tab-bar) .page {
   background-color: var(--color-surface);
 }
 
+/* 画面の下端。TabBar を出していないぶん、ここが最下部になる。
+   safe-area-inset-bottom は viewport-fit=cover が無い今は0だが、
+   将来入れたときにホームインジケータへ潜り込まないよう足してある。
+
+   背景は塗らない。地(--ds-color-base の淡いクリーム)の上に白を敷くと、
+   角丸の入力欄の外側に白い四角が見える。フレックスで領域を分けていて
+   スクロールする中身とは重ならないので、そもそも塗る必要がない */
 .message-form {
+  flex: none;
   display: flex;
+  align-items: center;
   gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
+  padding: var(--spacing-md) 0
+    calc(var(--spacing-md) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-border);
 }
 
 .message-form input {
