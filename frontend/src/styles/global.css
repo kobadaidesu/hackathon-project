@@ -39,6 +39,12 @@
   --font-size-base: 15px;
   --font-size-lg: 18px;
 
+  /* 入力欄だけは16pxを下回らせない。iOS Safariは、フォーカスした入力欄の
+     文字が16px未満だと読ませるために勝手に拡大し、指で戻すまで画面が
+     ズームしたままになる。本文と同じ15pxにすると、DMを打つたびに毎回
+     これが起きる。1px差なので見た目には影響しない */
+  --font-size-input: 16px;
+
   /* --- 投稿画像 --- */
   --post-image-radius: 12px;
   --post-image-ratio: 4 / 3;
@@ -92,10 +98,12 @@ textarea {
 
 /* フォーム部品はブラウザ既定の書体・サイズを持っていて body から継承しない。
    .form-group の外に素で置かれた input(ログイン・新規登録・DM入力など)が
-   標準ゴシックのままになるので、ここで丸ゴシックに揃える */
+   標準ゴシックのままになるので、ここで丸ゴシックに揃える。
+   サイズは inherit(=本文の15px)にせず、iOSの自動ズームを避けるため
+   --font-size-input を使う */
 input, textarea, select {
   font-family: inherit;
-  font-size: inherit;
+  font-size: var(--font-size-input);
 }
 
 a {
