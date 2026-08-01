@@ -698,7 +698,11 @@ body:has(.tab-bar) .page {
 
 /* 画面の下端。TabBar を出していないぶん、ここが最下部になる。
    safe-area-inset-bottom は viewport-fit=cover が無い今は0だが、
-   将来入れたときにホームインジケータへ潜り込まないよう足してある */
+   将来入れたときにホームインジケータへ潜り込まないよう足してある。
+
+   背景は塗らない。地(--ds-color-base の淡いクリーム)の上に白を敷くと、
+   角丸の入力欄の外側に白い四角が見える。フレックスで領域を分けていて
+   スクロールする中身とは重ならないので、そもそも塗る必要がない */
 .message-form {
   flex: none;
   display: flex;
@@ -707,7 +711,6 @@ body:has(.tab-bar) .page {
   padding: var(--spacing-md) 0
     calc(var(--spacing-md) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-border);
-  background-color: var(--color-bg);
 }
 
 .message-form input {
