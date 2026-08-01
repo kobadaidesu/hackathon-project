@@ -700,9 +700,18 @@ body:has(.tab-bar) .page {
   background-color: var(--color-primary);
 }
 
+/* 相手の吹き出しは白＋枠線。--color-surface(#FBF4E6)を敷いていたが、
+   画面の地の --ds-color-base(#FCF5E3)とのコントラスト比が 1.006:1 で、
+   実質同じ色だったため輪郭が消えていた。
+
+   この地の上では塗りをどう変えても差が出ない(白 1.088 / ベージュ 1.111 /
+   濃いベージュ 1.212)。効くのは枠線の濃さなので、そちらで形を出す。
+   既定の --ds-border-inset(#EFE3CC)は 1.168:1 でまだ弱かったので、
+   accent-light(#C9A57B / 2.110:1)まで上げている。太さは他の枠線と同じ1.5px */
 .message-bubble--theirs {
   align-self: flex-start;
-  background-color: var(--color-surface);
+  background-color: var(--ds-color-surface);
+  box-shadow: inset 0 0 0 1.5px var(--ds-color-accent-light);
 }
 
 /* 画面の下端。TabBar を出していないぶん、ここが最下部になる。
